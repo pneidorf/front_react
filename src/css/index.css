@@ -138,7 +138,7 @@ h2 {
 .desc {
   padding: 20px;
   animation: slideIn 1.5s ease-out;
-  margin-bottom: 150px;
+  margin-bottom: 50px;
 }
 
 .window-block {
@@ -235,12 +235,10 @@ form input{
   margin-bottom: 40px;
 }
 
-
 .image-map img {
-  width: 200px; /* Задаем фиксированный размер */
-  height: auto; /* Сохраняем пропорции */
-  position: absolute; /* Используем абсолютное позиционирование для центрирования */
-  top: 20%; 
+  position: fixed;
+  bottom: 10px;
+  top: 50%; 
   left: 50%; 
   transform: translate(-50%, -50%);
   z-index: 1000;

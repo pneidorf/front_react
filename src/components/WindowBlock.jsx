@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer} from 'react-leaflet';
+import React, { useEffect,useState } from 'react';
+import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import ImgMap from './ImgMap';
+import axios from 'axios';
 
-
-function WindowBlock() {
+function WindowBlock({onImageLoaded}) {
   const [activeTab, setActiveTab] = useState('plots');
+
+  const [imageBase64, setImageBase64] = useState('');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await axios.get('http://localhost:5000/generate_signal');
+        
+        if (result.data.imageBase64) {
+          setImageBase64(result.data.imageBase64);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+
+    if (onImageLoaded) {
+      onImageLoaded({ imageBase64});
+    }
+  }, []); 
+
+
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -35,20 +57,22 @@ function WindowBlock() {
               <input placeholder='...'/>
               <button className='form-button' type='button'>Рассчитать</button>
             </form>
-            
-            
           </div>}
           
-{activeTab === 'map' && 
-  <MapContainer center={[55.0152, 82.9296]} zoom={13} style={{ height: "570px", width: "100%" }}>
-    <TileLayer
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    />
-    <div className="image-map">
-      <ImgMap zoomLevel={13} />
-    </div>
-  </MapContainer>}
+          {activeTab === 'map' && 
+          <MapContainer center={[55.0152, 82.9296]} zoom={13} style={{ height: "570px", width: "100%" }}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <ImageOverlay
+              url={`data:image/svg+xml;base64,${imageBase64}`}
+              bounds={[
+                [55.0152, 82.9296],
+                [55.1, 82.9754]
+              ]}
+            />
+          </MapContainer>}
 
           {activeTab === 'sin' && <div>Пустая страница</div>}
         </div>
