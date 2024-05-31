@@ -1,5 +1,5 @@
 import React, { useEffect,useState } from 'react';
-import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
+import { MapContainer, TileLayer, ImageOverlay, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 
@@ -26,6 +26,26 @@ function WindowBlock({onImageLoaded}) {
       onImageLoaded({ imageBase64});
     }
   }, []); 
+
+  const [markersData, setMarkersData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await axios.get('http://localhost:5173/termalmapdata.json');
+        
+        if (result.data && Array.isArray(result.data)) {
+          setMarkersData(result.data.map(data => ({
+            position: [data.latitude, data.longitude],
+            key: data.id,
+          })));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
 
 
@@ -72,6 +92,9 @@ function WindowBlock({onImageLoaded}) {
                 [55.1, 82.9754]
               ]}
             />
+            {markersData.length > 0 && markersData.map(marker => (
+              <Marker position={marker.position} key={marker.key} />
+            ))}
           </MapContainer>}
 
           {activeTab === 'sin' && <div>Пустая страница</div>}
