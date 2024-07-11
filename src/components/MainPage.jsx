@@ -1,20 +1,18 @@
-import React from 'react';
-import Header from './Header';
-import ProjectDescription from './ProjectDescription';
-import WindowBlock from './WindowBlock';
+import React from 'react'
+import ProjectDescription from './ProjectDescription'
+import WindowBlock from './WindowBlock'
 
 class MainPage extends React.Component {
-    render () {
-      return (
-        <div className="App">
+  render() {
+    return (
+      <div className='App'>
         <ProjectDescription />
         <aside>
-        <WindowBlock />
+          <WindowBlock />
         </aside>
       </div>
-      )
-    }
-  
+    )
   }
-  
-  export default MainPage;
+}
+
+export default MainPage

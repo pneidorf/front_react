@@ -1,16 +1,14 @@
-import React from 'react';
+import React from 'react'
 
 class ProjectDescription extends React.Component {
-  render () {
+  render() {
     return (
       <section>
-      <h2>Описание проекта</h2>
-      <p className='desc'>Тут что-то будет написано</p>
+        <h2>Описание проекта</h2>
+        <p className='desc'>Тут что-то будет написано</p>
       </section>
-
     )
   }
 }
 
-
-export default ProjectDescription;
+export default ProjectDescription

@@ -1,22 +1,17 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import ProjectDescription from './components/ProjectDescription';
-import WindowBlock from './components/WindowBlock';
-import Registration from './components/Registration';
-import AppRouter from './components/AppRouter';
-
+import React from 'react'
+import Header from './components/Header'
+import AppRouter from './components/AppRouter'
+const defaultTheme = 'lightTheme'
+document.documentElement.setAttribute('data-theme', defaultTheme)
 
 class App extends React.Component {
-  render () {
+  render() {
     return (
-      <div className="App">
-        <Header />
+      <div className='App'>
         <AppRouter></AppRouter>
       </div>
     )
   }
-
 }
 
-export default App;
+export default App

@@ -1,11 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 class Header extends React.Component {
-  render () {
-    return (
-      <header className='header'>Drive-test-GUI</header>
-    )
+  render() {
+    return <header className='header'>Drive-test-GUI</header>
   }
 }
 
-export default Header;
+export default Header
