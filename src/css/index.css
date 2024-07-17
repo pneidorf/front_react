@@ -131,8 +131,8 @@ html[data-theme='darkTheme'] {
 
 .map-wrapper {
   position: absolute;
-  height: 50%;
-  width: 50%;
+  height: 100%;
+  width: calc(100% - 256px);
   box-shadow: var(--box-shadow);
   background-color: var(--object-background-color);
 }

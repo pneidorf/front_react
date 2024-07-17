@@ -2,7 +2,15 @@ import React from 'react'
 
 class Header extends React.Component {
   render() {
-    return <header className='header'>Drive-test-GUI</header>
+    return (
+      <div
+        className='bg-white border-b h-10 flex items-center justify-center main-header'
+        style={{
+          transform: sidebarPosition,
+          zIndex: 9999
+        }}
+      />
+    )
   }
 }
 

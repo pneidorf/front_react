@@ -1,26 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { MapContainer, TileLayer, ImageOverlay, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import axios from 'axios'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
 import { diff } from '@egjs/children-differ'
 import TogleSwitch from './SwitchTheme'
-import { useMediaQuery } from 'react-responsive'
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
 import Map from './Map'
-
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend
-} from 'recharts'
+import Graph from './Graph'
 
 const Resizable = ({ onImageLoaded }) => {
   const [activeItem, setActiveItem] = useState(null)
@@ -82,31 +68,6 @@ const Resizable = ({ onImageLoaded }) => {
     setIsChecked3(!isChecked3)
   }
 
-  const [markersData, setMarkersData] = useState([])
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await axios.get('http://78.24.222.170:8080/api/sockets/thermalmapdata')
-
-        if (result.data && Array.isArray(result.data)) {
-          const filteredData = result.data.filter((_, index) => index % 100 === 0)
-          setMarkersData(
-            filteredData.map(data => ({
-              position: [data.longitude, data.latitude],
-              key: data.id,
-              rsrp: data.rsrp,
-              time: data.time
-            }))
-          )
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    fetchData()
-  }, [])
-
   return (
     <div className='flex bg-gray-100'>
       {!isClosed && (
@@ -149,23 +110,7 @@ const Resizable = ({ onImageLoaded }) => {
       )}
 
       <div className='biggest-container'>
-        {isChecked && (
-          <div className='map-block'>
-            <div className='map-container-small'>
-              {' '}
-              <ResponsiveContainer width='100%' height='100%'>
-                <LineChart width={500} height={300} data={markersData}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='time' />
-                  <YAxis domain={[-200, 'dataMax + 50']} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type='monotone' dataKey='rsrp' stroke='#8884d8' activeDot={{ r: 8 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
+        {isChecked && <Graph isChecked1={isChecked} />}
 
         {isChecked2 && <Map isChecked2={isChecked2} />}
 
