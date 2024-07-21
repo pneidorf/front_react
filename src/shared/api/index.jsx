@@ -1,7 +1,11 @@
 import axios from 'axios'
 
 export const instance = axios.create({
-  baseURL: 'http://78.24.222.170:8080'
+  baseURL: 'http://78.24.222.170:8080',
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json'
+  }
 })
 
 export const getThermalMapData = async () => {
