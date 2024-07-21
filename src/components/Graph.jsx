@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import axios from 'axios'
+import { getThermalMapData } from '../shared/api/index.jsx'
 import {
   ResponsiveContainer,
   LineChart,
@@ -16,7 +17,7 @@ export default function Graph({ isChecked1 }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await axios.get('http://78.24.222.170:8080/api/sockets/thermalmapdata')
+        const result = await getThermalMapData()
 
         if (result.data && Array.isArray(result.data)) {
           const filteredData = result.data.filter((_, index) => index % 80 === 0)
