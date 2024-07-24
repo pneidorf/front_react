@@ -7,6 +7,8 @@ import { diff } from '@egjs/children-differ'
 import TogleSwitch from './SwitchTheme'
 import Map from './Map'
 import Graph from './Graph'
+import Sidebar from './Sidebar'
+import Header from './Header'
 
 const Resizable = ({ onImageLoaded }) => {
   const [activeItem, setActiveItem] = useState(null)
@@ -70,6 +72,7 @@ const Resizable = ({ onImageLoaded }) => {
 
   return (
     <div className='flex bg-gray-100'>
+      {/* 
       {!isClosed && (
         <div
           className='bg-white w-64 min-h-screen flex flex-col application-block transform transition-transform duration-1000 ease-in-out'
@@ -108,6 +111,9 @@ const Resizable = ({ onImageLoaded }) => {
           </div>
         </div>
       )}
+        */}
+
+      <Sidebar />
 
       <div className='biggest-container'>
         {isChecked && <Graph isChecked1={isChecked} />}
@@ -197,6 +203,7 @@ const Resizable = ({ onImageLoaded }) => {
       </div>
 
       <main className='flex-grow flex flex-col min-h-screen'>
+        {/* 
         <header
           className='bg-white border-b h-10 flex items-center justify-center main-header'
           style={{
@@ -204,52 +211,13 @@ const Resizable = ({ onImageLoaded }) => {
             zIndex: 9999
           }}
         >
-          {isClosed ? (
-            <button
-              tabIndex='1'
-              aria-label='Открыть меню'
-              title='Open menu'
-              className='w-10 p-1 main-button min-w-8'
-              onClick={openSidebar}
-            >
-              <svg
-                aria-hidden='true'
-                fill='none'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path d='M4 6h16M4 12h16M4 18h16'></path>
-              </svg>
-            </button>
-          ) : (
-            <button
-              tabIndex='1'
-              aria-label='Закрыть меню'
-              title='Close menu'
-              className='w-10 p-1 main-button min-w-8'
-              onClick={closeSidebar}
-            >
-              <svg
-                fill='none'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path d='M6 18L18 6M6 6l12 12'></path>
-              </svg>
-            </button>
-          )}
           <div className='flex flex-grow items-center justify-between px-3'>
-            <h1>Домой</h1>
             <TogleSwitch />
             <button className='text-blue-700 underline'>Войти</button>
           </div>
         </header>
+        */}
+        <Header />
       </main>
     </div>
   )
