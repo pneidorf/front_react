@@ -8,16 +8,23 @@ To get started with GUI, follow these steps:
    git clone git@github.com:pneidorf/front_react.git
    ```
 
-2. Install dependencies:
+2. Change ENV variables:
+
+   ```
+   cp .env.example .env
+   nano .env
+   ```
+
+3. Install dependencies:
 
    ```
    npm install
    ```
 
-3. Start the development server:
+4. Start the development server:
 
    ```
    npm run dev
    ```
 
-4. Access the application at [http://localhost:5173](http://localhost:5173).
+5. Access the application at [http://localhost:5173](http://localhost:5173).
