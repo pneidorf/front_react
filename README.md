@@ -5,7 +5,7 @@ To get started with GUI, follow these steps:
 1. Clone the repository:
 
    ```
-   git clone <repository_url>
+   git clone git@github.com:pneidorf/front_react.git
    ```
 
 2. Install dependencies:
