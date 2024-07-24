@@ -4,7 +4,7 @@ import './app.css'
 import { AppRouter } from './providers/route-provider'
 
 export const Root: FC = () => (
-  <div className='app'>
+  <div>
     <AppRouter />
   </div>
 )
