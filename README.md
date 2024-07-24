@@ -1,6 +1,6 @@
 ## Getting Started
 
-To get started with CourseRater, follow these steps:
+To get started with GUI, follow these steps:
 
 1. Clone the repository:
 
