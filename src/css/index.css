@@ -511,6 +511,10 @@ form input {
   font-weight: 500;
 }
 
+.sidebar svg {
+  stroke: var(--text-color);
+}
+
 @keyframes slideUpAndFade {
   from {
     opacity: 0;

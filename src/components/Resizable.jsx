@@ -9,6 +9,7 @@ import Map from './Map'
 import Graph from './Graph'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import EditGraph from './EditGraph'
 
 const Resizable = ({ onImageLoaded }) => {
   const [activeItem, setActiveItem] = useState(null)
@@ -59,6 +60,7 @@ const Resizable = ({ onImageLoaded }) => {
   const [isChecked, setIsChecked] = useState(false)
   const [isChecked2, setIsChecked2] = useState(false)
   const [isChecked3, setIsChecked3] = useState(false)
+  const [isChecked4, setIsChecked4] = useState(false)
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked)
@@ -68,6 +70,10 @@ const Resizable = ({ onImageLoaded }) => {
   }
   const handleCheckboxChange3 = () => {
     setIsChecked3(!isChecked3)
+  }
+
+  const handleCheckboxChange4 = () => {
+    setIsChecked4(!isChecked4)
   }
 
   return (
@@ -111,14 +117,22 @@ const Resizable = ({ onImageLoaded }) => {
           </div>
         </div>
       )}
-        */}
-
-      <Sidebar />
+*/}
+      <Sidebar
+        isChecked={isChecked}
+        handleCheckboxChange={handleCheckboxChange}
+        isChecked2={isChecked2}
+        handleCheckboxChange2={handleCheckboxChange2}
+        isChecked3={isChecked3}
+        handleCheckboxChange3={handleCheckboxChange3}
+      />
 
       <div className='biggest-container'>
         {isChecked && <Graph isChecked1={isChecked} />}
 
         {isChecked2 && <Map isChecked2={isChecked2} />}
+
+        {isChecked3 && <EditGraph isChecked3={isChecked3} />}
 
         <Moveable
           ref={moveableRef}
@@ -157,7 +171,7 @@ const Resizable = ({ onImageLoaded }) => {
         <Selecto
           ref={selectoRef}
           dragContainer={window}
-          selectableTargets={['.map-wrapper', '.map-container-small']}
+          selectableTargets={['.map-wrapper', '.map-container-small', '.map-container-form']}
           hitRate={0}
           selectByClick={true}
           selectFromInside={false}

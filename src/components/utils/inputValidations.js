@@ -7,18 +7,17 @@ export const name_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     maxLength: {
       value: 30,
-      message: '30 characters max',
+      message: '30 characters max'
     },
     pattern: {
-      value:
-        /^[а-яА-Яa-zA-Z]+$/,
-      message: 'invalid character',
-    },
-  },
+      value: /^[а-яА-Яa-zA-Z]+$/,
+      message: 'invalid character'
+    }
+  }
 }
 
 export const surname_validation = {
@@ -30,18 +29,17 @@ export const surname_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     maxLength: {
       value: 30,
-      message: '30 characters max',
+      message: '30 characters max'
     },
     pattern: {
-      value:
-        /^[а-яА-Яa-zA-Z]+$/,
-      message: 'invalid character',
-    },
-  },
+      value: /^[а-яА-Яa-zA-Z]+$/,
+      message: 'invalid character'
+    }
+  }
 }
 
 export const desc_validation = {
@@ -53,13 +51,13 @@ export const desc_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     maxLength: {
       value: 200,
-      message: '200 characters max',
-    },
-  },
+      message: '200 characters max'
+    }
+  }
 }
 
 export const password_validation = {
@@ -71,18 +69,17 @@ export const password_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     minLength: {
       value: 6,
-      message: 'min 6 characters',
+      message: 'min 6 characters'
     },
     pattern: {
-      value:
-        /^[a-zA-Z0-9]+$/,
-      message: 'invalid character',
-    },
-  },
+      value: /^[a-zA-Z0-9]+$/,
+      message: 'invalid character'
+    }
+  }
 }
 export const repeat_validation = {
   name: 'repeat_password',
@@ -93,36 +90,34 @@ export const repeat_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     repeated: {
       value: true,
       message: 'passwords dont match'
     },
     pattern: {
-      value:
-        /^[a-zA-Z0-9]+$/,
-      message: 'invalid character',
-    },
-  },
+      value: /^[a-zA-Z0-9]+$/,
+      message: 'invalid character'
+    }
+  }
 }
 export const login_password_validation = {
-  name: 'login_password',
+  name: 'password',
   label: 'password',
   type: 'password',
-  id: 'login_password',
+  id: 'password',
   placeholder: 'type password ...',
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     pattern: {
-      value:
-        /^[a-zA-Z0-9]+$/,
-      message: 'invalid character',
-    },
-  },
+      value: /^[a-zA-Z0-9]+$/,
+      message: 'invalid character'
+    }
+  }
 }
 
 export const num_validation = {
@@ -134,14 +129,13 @@ export const num_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     pattern: {
-      value:
-        /^\+?[1-9]\d{1,14}$/,
-      message: 'incorrect phone number',
+      value: /^\+?[1-9]\d{1,14}$/,
+      message: 'incorrect phone number'
     }
-  },
+  }
 }
 
 export const email_validation = {
@@ -153,12 +147,12 @@ export const email_validation = {
   validation: {
     required: {
       value: true,
-      message: 'required',
+      message: 'required'
     },
     pattern: {
       value:
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      message: 'not valid',
-    },
-  },
+      message: 'not valid'
+    }
+  }
 }

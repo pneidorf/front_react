@@ -11,7 +11,7 @@ export const instance = axios.create({
 export const getThermalMapData = async () => {
   try {
     const response = await instance.get('/api/sockets/thermalmapdata')
-    return response.data
+    return response
   } catch (error) {
     console.error(error)
     throw error
@@ -24,7 +24,20 @@ export const loginUser = async (email, password) => {
       email,
       password
     })
-    return response.data
+    return response
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const regUser = async (email, password) => {
+  try {
+    const response = await instance.post('/api/user/register', {
+      email,
+      password
+    })
+    return response
   } catch (error) {
     console.error(error)
     throw error

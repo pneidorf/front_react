@@ -12,8 +12,8 @@ export const LoginForm = () => {
 
   const handleLogin = async data => {
     try {
-      await loginUser(data.email, data.password)
-      if (response.status === 200) {
+      const response = await loginUser(data.email, data.password)
+      if (response.status === 200 || response.status === 201) {
         navigate('/main')
       } else {
         throw new Error('Ошибка авторизации')
@@ -51,20 +51,28 @@ export const LoginForm = () => {
 
 export const RegistrationForm = () => {
   const navigate = useNavigate()
-
-  const handleLoginClick = () => {
-    navigate('/')
-  }
   const methods = useForm()
-
+  const handleRegistration = async data => {
+    try {
+      const response = await regUser(data.email, data.password_valid)
+      if (response.status === 200 || response.status === 201) {
+        navigate('/')
+        alert('Проверте почту')
+      } else {
+        throw new Error('Ошибка регистрации')
+      }
+    } catch (error) {
+      alert('Неверная почта')
+    }
+  }
   const onSubmit = methods.handleSubmit(data => {
-    handleLoginClick()
+    handleRegistration(data)
   })
 
   return (
     <FormProvider {...methods}>
       <form
-        onSubmit={e => e.preventDefault()}
+        onSubmit={onSubmit}
         noValidate
         autoComplete='off'
         className='pre-registration-container-form'
@@ -75,7 +83,7 @@ export const RegistrationForm = () => {
         <Input {...email_validation} />
         <Input {...password_validation} />
         <Input {...repeat_validation} />
-        <button className='form-button' type='button' onClick={onSubmit}>
+        <button className='form-button' type='submit'>
           Зарегестрироваться
         </button>
       </form>
