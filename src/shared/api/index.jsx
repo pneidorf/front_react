@@ -39,7 +39,8 @@ export const regUser = async (email, password) => {
     })
     return response
   } catch (error) {
-    console.error(error)
-    throw error
+    // console.error(error)
+    // throw error
+    return { ...error.response }
   }
 }
