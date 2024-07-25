@@ -1,9 +1,48 @@
 import type { Config } from 'tailwindcss'
 
+const fontSize = {
+  xs: '10px',
+  sm: '11px',
+  base: '12px',
+  lg: '14px',
+  xl: '18px'
+}
 const config: Config = {
+  darkMode: ['class'],
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
-    extend: {}
+    fontSize,
+    extend: {
+      borderRadius: {
+        default: '8px'
+      },
+      backgroundColor: {
+        contrast: 'var(--contrast-color)',
+        primary: 'var(--gray-1)',
+        secondary: 'var(--gray-2)',
+        tertiary: 'var(--gray-3)'
+      },
+      textColor: {
+        primary: 'var(--gray-12)',
+        secondary: 'var(--gray-11)',
+        tertiary: 'var(--gray-9)',
+        link: 'var(--blue-10)'
+      },
+      borderColor: {
+        primary: 'var(--gray-6)',
+        secondary: 'var(--gray-3)'
+      },
+      divideColor: {
+        primary: 'var(--gray-6)',
+        secondary: 'var(--gray-3)'
+      },
+      ringOffsetColor: {
+        primary: 'var(--gray-12)'
+      },
+      boxShadow: {
+        soft: '0 15px 30px 0 rgba(0, 0, 0, 0.04)'
+      }
+    }
   },
   plugins: []
 }
