@@ -13,12 +13,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg: var(--gray-1);
-    --boxBg: var(--gray-4);
-    --link: var(--blue-10);
-  }
-
   .light {
     --contrast-color: #fff;
   }
@@ -29,7 +23,6 @@
 
   body {
     overflow-x: hidden;
-    background-color: var(--bg);
   }
 }
 

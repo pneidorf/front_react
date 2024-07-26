@@ -4,7 +4,9 @@ import { PageWrapper } from './page-wrapper'
 import { AppRouter } from './providers/route-provider'
 
 export const App: FC = () => (
-  <PageWrapper>
-    <AppRouter />
-  </PageWrapper>
+  <div className='h-[100vh] w-full bg-white dark:bg-black'>
+    <PageWrapper>
+      <AppRouter />
+    </PageWrapper>
+  </div>
 )

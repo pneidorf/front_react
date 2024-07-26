@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { FC, ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -12,7 +13,11 @@ interface PageWrapperProps {
 export const PageWrapper: FC<PageWrapperProps> = ({ children }) => {
   const { pathname } = useLocation()
   return (
-    <div className='relative w-full bg-primary text-primary'>
+    <div
+      className={clsx('relative h-full w-full pt-[70px] text-primary', {
+        'pl-[60px]': pathname !== RoutePath.auth
+      })}
+    >
       <Header />
       {pathname !== RoutePath.auth && <Sidebar />}
       {children}
