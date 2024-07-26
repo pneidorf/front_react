@@ -14,9 +14,12 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.5",
     "@radix-ui/colors": "^3.0.0",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
+    "framer-motion": "^11.3.17",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
