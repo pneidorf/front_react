@@ -48,7 +48,6 @@ module.exports = {
     'jsx-quotes': ['error', 'prefer-single'],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
-    'react/jsx-curly-newline': ['error', 'consistent'],
     'react/jsx-wrap-multilines': [
       'error',
       {
