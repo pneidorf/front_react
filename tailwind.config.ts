@@ -33,10 +33,17 @@ const config: Config = {
         primary: 'var(--gray-6)',
         secondary: 'var(--gray-3)'
       },
-      boxShadow: {
-        soft: '0 15px 30px 0 rgba(0, 0, 0, 0.04)',
-        sidebar: '1px 0 0 0 #2b2f3c'
-      }
+      ringColor: {
+        primary: 'var(--gray-6)',
+        secondary: 'var(--gray-3)'
+      },
+      fill: {
+        primary: 'var(--gray-1)',
+        secondary: 'var(--gray-2)',
+        tertiary: 'var(--gray-3)',
+        accent: 'var(--blue-9)'
+      },
+      boxShadow: {}
     }
   },
   plugins: []

@@ -7,7 +7,8 @@ import { NotFoundPage } from '~/pages/not-found'
 export const AppRoutes = {
   MAIN: 'main',
   AUTH: 'auth',
-  NOTFOUND: 'notFound'
+  NOTFOUND: 'notFound',
+  MAP: 'map'
 } as const
 
 export type AppRoutesT = (typeof AppRoutes)[keyof typeof AppRoutes]
@@ -15,6 +16,7 @@ export type AppRoutesT = (typeof AppRoutes)[keyof typeof AppRoutes]
 export const RoutePath: Record<AppRoutesT, string> = {
   [AppRoutes.MAIN]: '/',
   [AppRoutes.AUTH]: '/auth',
+  [AppRoutes.MAP]: '/map',
   [AppRoutes.NOTFOUND]: '*'
 }
 
@@ -29,6 +31,10 @@ export const routeConfig: Record<AppRoutesT, RouteProps> = {
   },
   [AppRoutes.AUTH]: {
     path: RoutePath.auth,
+    element: <AuthPage />
+  },
+  [AppRoutes.MAP]: {
+    path: RoutePath.map,
     element: <AuthPage />
   }
 }

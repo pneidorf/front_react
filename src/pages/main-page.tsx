@@ -1,3 +1,3 @@
 import { memo } from 'react'
 
-export const MainPage = memo(() => <div>MainPage</div>)
+export const MainPage = memo(() => <div></div>)
