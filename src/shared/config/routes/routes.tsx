@@ -1,12 +1,13 @@
 import { RouteProps } from 'react-router-dom'
 
-import { AuthPage, MainPage, MapPage, NotFoundPage } from '~/pages'
+import { AuthPage, MainPage, MapPage, NotFoundPage, PlotsPage } from '~/pages'
 
 export const AppRoutes = {
   MAIN: 'main',
   AUTH: 'auth',
   NOTFOUND: 'notFound',
-  MAP: 'map'
+  MAP: 'map',
+  PLOTS: 'plots'
 } as const
 
 export type AppRoutesT = (typeof AppRoutes)[keyof typeof AppRoutes]
@@ -15,7 +16,8 @@ export const RoutePath: Record<AppRoutesT, string> = {
   [AppRoutes.MAIN]: '/',
   [AppRoutes.AUTH]: '/auth',
   [AppRoutes.MAP]: '/map',
-  [AppRoutes.NOTFOUND]: '*'
+  [AppRoutes.NOTFOUND]: '*',
+  [AppRoutes.PLOTS]: '/plots'
 }
 
 export const routeConfig: Record<AppRoutesT, RouteProps> = {
@@ -34,5 +36,9 @@ export const routeConfig: Record<AppRoutesT, RouteProps> = {
   [AppRoutes.MAP]: {
     path: RoutePath.map,
     element: <MapPage />
+  },
+  [AppRoutes.PLOTS]: {
+    path: RoutePath.plots,
+    element: <PlotsPage />
   }
 }
