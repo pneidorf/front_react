@@ -4,14 +4,13 @@ import { Link } from 'react-router-dom'
 import { tabs } from '../lib/constants'
 
 import { ThemeSwitcher } from '~/features/theme-switcher'
-import Logo from '~/shared/assets/images/logo.png'
-import { Button, CurrentDate } from '~/shared/ui'
+import { Button, CurrentDate, Logo } from '~/shared/ui'
 
 export const Header = memo(() => (
   <div className='fixed left-0 right-0 top-0 z-30 h-[70px]'>
     <div className='flex h-full w-full items-center justify-between px-6 py-3'>
       <div className='flex flex-row items-center'>
-        <img className='h-[50px]' src={Logo} alt='logo' />
+        <Logo />
         <div className='ml-8'>
           <CurrentDate />
         </div>

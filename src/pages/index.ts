@@ -1,0 +1,4 @@
+export { AuthPage } from './auth-page'
+export { MainPage } from './main-page'
+export { MapPage } from './map-page'
+export { NotFoundPage } from './not-found-page'

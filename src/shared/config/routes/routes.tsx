@@ -1,8 +1,6 @@
 import { RouteProps } from 'react-router-dom'
 
-import { AuthPage } from '~/pages/auth'
-import { MainPage } from '~/pages/main-page'
-import { NotFoundPage } from '~/pages/not-found'
+import { AuthPage, MainPage, MapPage, NotFoundPage } from '~/pages'
 
 export const AppRoutes = {
   MAIN: 'main',
@@ -35,6 +33,6 @@ export const routeConfig: Record<AppRoutesT, RouteProps> = {
   },
   [AppRoutes.MAP]: {
     path: RoutePath.map,
-    element: <AuthPage />
+    element: <MapPage />
   }
 }
