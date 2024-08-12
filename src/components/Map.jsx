@@ -96,7 +96,7 @@ export default function Map({ isChecked2 }) {
 
   return (
     <div className='map-obertka'>
-      <div className='map-wrapper' ref={mapContainerRef}></div>
+      <div className='map-wrapper' style={{ zIndex: 9999 }} ref={mapContainerRef}></div>
     </div>
   )
 }

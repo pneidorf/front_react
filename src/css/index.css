@@ -133,8 +133,10 @@ html[data-theme='darkTheme'] {
 
 .map-wrapper {
   position: absolute;
-  height: 100%;
-  width: 100%;
+  height: calc(100% - 41px);
+  top: 41px;
+  width: calc(100% - 60px);
+  left: 60px;
   box-shadow: var(--box-shadow);
   background-color: var(--object-background-color);
 }
@@ -400,6 +402,15 @@ form input {
 }
 
 .sidebar-content-header {
+  padding: 50px 12px 0;
+}
+
+.content-header {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
   padding: 50px 12px 0;
 }
 

@@ -4,11 +4,9 @@ import axios from 'axios'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
 import { diff } from '@egjs/children-differ'
-import TogleSwitch from './SwitchTheme'
 import Map from './Map'
 import Graph from './Graph'
 import Sidebar from './Sidebar'
-import Header from './Header'
 import EditGraph from './EditGraph'
 
 const Resizable = ({ onImageLoaded }) => {
@@ -78,46 +76,6 @@ const Resizable = ({ onImageLoaded }) => {
 
   return (
     <div className='flex bg-gray-100'>
-      {/* 
-      {!isClosed && (
-        <div
-          className='bg-white w-64 min-h-screen flex flex-col application-block transform transition-transform duration-1000 ease-in-out'
-          style={{
-            transform: sidebarPosition,
-            zIndex: 9999
-          }}
-        >
-          <div className='bg-white border-r border-b px-4 h-10 flex items-center application-block application-header'>
-            <span className='text-blue py-2'>Application</span>
-          </div>
-
-          <div className='border-r flex-grow application-block'>
-            <nav>
-              <ul>
-                <li className='p-3'>
-                  <label>
-                    <input type='checkbox' checked={isChecked} onChange={handleCheckboxChange} />
-                    Plots
-                  </label>
-                </li>
-                <li className='p-3'>
-                  <label>
-                    <input type='checkbox' checked={isChecked2} onChange={handleCheckboxChange2} />
-                    Maps
-                  </label>
-                </li>
-                <li className='p-3'>
-                  <label>
-                    <input type='checkbox' checked={isChecked3} onChange={handleCheckboxChange3} />
-                    Sin
-                  </label>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      )}
-*/}
       <Sidebar
         isChecked={isChecked}
         handleCheckboxChange={handleCheckboxChange}
@@ -171,7 +129,7 @@ const Resizable = ({ onImageLoaded }) => {
         <Selecto
           ref={selectoRef}
           dragContainer={window}
-          selectableTargets={['.map-wrapper', '.map-container-small', '.map-container-form']}
+          selectableTargets={['.map-container-small', '.map-container-form']}
           hitRate={0}
           selectByClick={true}
           selectFromInside={false}
@@ -216,23 +174,7 @@ const Resizable = ({ onImageLoaded }) => {
         />
       </div>
 
-      <main className='flex-grow flex flex-col min-h-screen'>
-        {/* 
-        <header
-          className='bg-white border-b h-10 flex items-center justify-center main-header'
-          style={{
-            transform: sidebarPosition,
-            zIndex: 9999
-          }}
-        >
-          <div className='flex flex-grow items-center justify-between px-3'>
-            <TogleSwitch />
-            <button className='text-blue-700 underline'>Войти</button>
-          </div>
-        </header>
-        */}
-        <Header />
-      </main>
+      <main className='flex-grow flex flex-col min-h-screen'></main>
     </div>
   )
 }
