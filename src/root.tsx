@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { App } from '~/app/app'
 import { ThemeProvider } from '~/app/providers/theme-provider'
 import '~/app/styles/globals.css'
+import '~/shared/config/i18n'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
