@@ -14,7 +14,7 @@ i18n
     },
     supportedLngs: ['en', 'ru'],
     backend: {
-      loadPath: '../../../../public/locales/{{lng}}/{{ns}}.json'
+      loadPath: '/locales/{{lng}}/{{ns}}.json'
     }
   })
 
