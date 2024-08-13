@@ -2,5 +2,10 @@
   "login": "Login",
   "logout": "Logout",
   "map": "Map",
-  "plots": "Plots"
+  "plots": "Plots",
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "Automatic"
+  }
 }
