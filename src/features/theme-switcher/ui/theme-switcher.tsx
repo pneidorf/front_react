@@ -54,7 +54,7 @@ export const ThemeSwitcher = memo(() => {
                     value={theme}
                     className={({ active }) =>
                       clsx(
-                        'relative cursor-default select-none rounded-md py-2 pl-10 pr-4',
+                        'relative cursor-pointer select-none rounded-md py-2 pl-10 pr-4',
                         active ? 'bg-secondary' : ''
                       )
                     }
