@@ -1,7 +1,9 @@
-import { Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
+import { Map as MapLibreMap, Marker, NavigationControl } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useTheme } from 'next-themes'
 import { FC, useEffect, useRef, useState } from 'react'
+
+import { useFetchMarkers } from '~/entities/markers'
 
 export const Map: FC = () => {
   const [lng] = useState(82.9296)
@@ -29,6 +31,15 @@ export const Map: FC = () => {
     })
     map.current.addControl(nav, 'top-left')
   }, [lat, lng, mapStyle, zoom])
+
+  const markers = useFetchMarkers()
+  markers.data?.map(marker => {
+    const el = document.createElement('div')
+    el.className = 'marker'
+    new Marker({ element: el })
+      .setLngLat([marker.lon, marker.lat])
+      .addTo(map.current as MapLibreMap)
+  })
 
   return <div className='h-full w-full' ref={mapContainer} />
 }
