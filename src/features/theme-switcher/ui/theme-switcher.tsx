@@ -5,10 +5,12 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { memo, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const ThemeSwitcher = memo(() => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme, resolvedTheme, themes } = useTheme()
+  const { t } = useTranslation('header')
 
   useEffect(() => {
     setMounted(true)
@@ -64,7 +66,7 @@ export const ThemeSwitcher = memo(() => {
                         <span
                           className={`block truncate text-lg ${selected ? 'font-medium' : 'font-normal'}`}
                         >
-                          {theme === 'system' ? 'Automatic' : theme}
+                          {theme === 'system' ? `${t('theme.system')}` : `${t(`theme.${theme}`)}`}
                         </span>
                         {selected && (
                           <span className='absolute inset-y-0 left-0 flex items-center pl-3 dark:text-neutral-50'>
