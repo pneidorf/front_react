@@ -41,3 +41,10 @@
 .maplibregl-ctrl-bottom-right {
   display: none;
 }
+
+.phone {
+  background-image: url('../../features/auth/icons/phone.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

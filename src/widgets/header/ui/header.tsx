@@ -6,6 +6,7 @@ import { tabs } from '../lib/constants'
 
 import { LangSwitcher } from '~/features/lang-switcher'
 import { ThemeSwitcher } from '~/features/theme-switcher'
+import { RoutePath } from '~/shared/config'
 import { Button, CurrentDate, Logo } from '~/shared/ui'
 
 export const Header = memo(() => {
@@ -32,9 +33,11 @@ export const Header = memo(() => {
           ))}
         </div>
         <div className='flex items-center gap-4'>
-          <Button size='large' appearance='primary'>
-            {t('login')}
-          </Button>
+          <Link to={RoutePath.auth}>
+            <Button size='large' appearance='primary'>
+              {t('login')}
+            </Button>
+          </Link>
           <ThemeSwitcher />
           <LangSwitcher />
         </div>
