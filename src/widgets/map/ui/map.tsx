@@ -42,6 +42,8 @@ export const Map: FC = () => {
     default: `${commonMarkerStyle} background-color: gray;`
   }
 
+  const markers = useFetchMarkers()
+
   useEffect(() => {
     if (!mapContainer.current) return
 
@@ -58,26 +60,29 @@ export const Map: FC = () => {
     map.current.addControl(nav, 'top-left')
   }, [lat, lng, mapStyle, zoom])
 
-  const markers = useFetchMarkers()
-  markers.data
-    ?.filter((_, index) => index % 10 === 0)
-    .map(marker => {
-      const el = document.createElement('div')
+  useEffect(() => {
+    if (!map.current || !markers.data) return
+    markers.data
+      ?.filter((_, index) => index % 10 === 0)
+      .map(marker => {
+        const el = document.createElement('div')
 
-      const markerClass = getMarkerStyleClass(marker.rsrp)
-      el.style.cssText = markerStyles[markerClass] || markerStyles['default']
+        const markerClass = getMarkerStyleClass(marker.rsrp)
+        el.style.cssText = markerStyles[markerClass] || markerStyles['default']
 
-      const htmlPopup = `
-  <p><strong>Time:</strong> ${marker.time}</p>
-  <p><strong>Rsrp:</strong> ${marker.rsrp}</p>
-`
-      const popup = new maplibregl.Popup({ offset: 25 }).setHTML(htmlPopup)
+        const htmlPopup = `
+        <p><strong>Time:</strong> ${marker.time}</p>
+        <p><strong>Rsrp:</strong> ${marker.rsrp}</p>
+      `
+        const popup = new maplibregl.Popup({ offset: 25 }).setHTML(htmlPopup)
 
-      new Marker({ element: el })
-        .setLngLat([marker.lon, marker.lat])
-        .setPopup(popup)
-        .addTo(map.current as MapLibreMap)
-    })
+        new Marker({ element: el })
+          .setLngLat([marker.lon, marker.lat])
+          .setPopup(popup)
+          .addTo(map.current as MapLibreMap)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markers.data])
 
   return <div className='h-full w-full' ref={mapContainer} />
 }
