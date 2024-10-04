@@ -1,8 +1,10 @@
 {
   "login": "Login",
   "logout": "Logout",
+  "main": "Main page",
   "map": "Map",
   "plots": "Plots",
+  "diagrams": "Diagrams",
   "theme": {
     "dark": "Dark",
     "light": "Light",

@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { startTransition } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { RoutePath } from '../config'
@@ -8,7 +9,10 @@ import LogoIcon from '~/shared/assets/images/logo.png'
 export const Logo = memo(() => {
   const navigate = useNavigate()
   const handleNavigate = () => {
-    navigate(RoutePath.main)
+    // navigate(RoutePath.main)
+    startTransition(() => {
+      navigate(RoutePath.main)
+    })
   }
 
   return (
