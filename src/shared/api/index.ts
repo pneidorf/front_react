@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
+import { DiagramsData } from '~/entities/diagrams/model/types'
 // import Cookies from 'js-cookie'
 // import { getAccessToken } from '../lib'
 import { MarkerData } from '~/entities/markers'
@@ -52,6 +53,21 @@ export const api = {
     try {
       // const response = await instance.get('/sockets/getrsrpquality')
       const response = await instance_rsrp.get('/sockets/getrsrpquality')
+
+      // const { token } = response.data
+      // localStorage.setItem('token', token)
+      // const filteredData = response.data.filter((_: never, index: number) => index % 80 === 0)
+      // return filteredData.data
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+  async getAppTraffic(): Promise<DiagramsData[]> {
+    try {
+      // const response = await instance.get('/sockets/getrsrpquality')
+      const response = await instance_rsrp.get('/user/getapptrafic')
 
       // const { token } = response.data
       // localStorage.setItem('token', token)

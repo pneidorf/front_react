@@ -1,13 +1,15 @@
 import { RouteProps } from 'react-router-dom'
 
 import { AuthPage, MainPage, MapPage, NotFoundPage, PlotsPage } from '~/pages'
+import { DiagramsPage } from '~/pages/diagrams-page'
 
 export const AppRoutes = {
   MAIN: 'main',
   AUTH: 'auth',
   NOTFOUND: 'notFound',
   MAP: 'map',
-  PLOTS: 'plots'
+  PLOTS: 'plots',
+  DIAGRAMS: 'diagrams'
 } as const
 
 export type AppRoutesT = (typeof AppRoutes)[keyof typeof AppRoutes]
@@ -17,17 +19,18 @@ export const RoutePath: Record<AppRoutesT, string> = {
   [AppRoutes.AUTH]: '/auth',
   [AppRoutes.MAP]: '/map',
   [AppRoutes.NOTFOUND]: '*',
-  [AppRoutes.PLOTS]: '/plots'
+  [AppRoutes.PLOTS]: '/plots',
+  [AppRoutes.DIAGRAMS]: '/diagrams'
 }
 
 export const routeConfig: Record<AppRoutesT, RouteProps> = {
-  [AppRoutes.MAIN]: {
-    path: RoutePath.main,
-    element: <MainPage />
-  },
   [AppRoutes.NOTFOUND]: {
     path: RoutePath.notFound,
     element: <NotFoundPage />
+  },
+  [AppRoutes.MAIN]: {
+    path: RoutePath.main,
+    element: <MainPage />
   },
   [AppRoutes.AUTH]: {
     path: RoutePath.auth,
@@ -40,5 +43,9 @@ export const routeConfig: Record<AppRoutesT, RouteProps> = {
   [AppRoutes.PLOTS]: {
     path: RoutePath.plots,
     element: <PlotsPage />
+  },
+  [AppRoutes.DIAGRAMS]: {
+    path: RoutePath.diagrams,
+    element: <DiagramsPage />
   }
 }
