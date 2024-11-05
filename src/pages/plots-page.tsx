@@ -4,7 +4,7 @@
 import { diff } from '@egjs/children-differ'
 import { LayersIcon } from '@radix-ui/react-icons'
 import * as Popover from '@radix-ui/react-popover'
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import { useState } from 'react'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
@@ -38,7 +38,7 @@ export const PlotsPage = () => {
   }
 
   return (
-    <div>
+    <div className='relative ml-[2rem] h-[55rem] w-[113rem] border-2 border-none'>
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
@@ -47,7 +47,7 @@ export const PlotsPage = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className='PopoverContent'
+            className='PopoverContent bg-tertiary'
             side='right'
             sideOffset={20}
             style={{ zIndex: 9999 }}
@@ -77,6 +77,7 @@ export const PlotsPage = () => {
 
       <div>
         {showPlots && <Plot />}
+
         <Moveable
           ref={moveableRef}
           target={targets}
@@ -85,6 +86,16 @@ export const PlotsPage = () => {
           rotatable={true}
           pinchable={true}
           pinchOutside={true}
+          edge={true}
+          keepRatio={true}
+          snappable={true}
+          bounds={{
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            position: 'css'
+          }}
           onRender={(e: any) => {
             e.target.style.cssText += e.cssText
           }}
@@ -93,6 +104,9 @@ export const PlotsPage = () => {
           }}
           onDrag={(e: any) => {
             e.target.style.transform = e.transform
+          }}
+          onBound={e => {
+            console.log(e)
           }}
           onDragGroup={(e: any) => {
             e.events.forEach((ev: any) => {

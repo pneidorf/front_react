@@ -38,7 +38,7 @@ export const DiagramsPage = () => {
   }
 
   return (
-    <div>
+    <div className='relative ml-[2rem] h-[55rem] w-[113rem] border-2 border-none'>
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
@@ -47,15 +47,13 @@ export const DiagramsPage = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className='PopoverContent'
+            className='PopoverContent bg-tertiary'
             side='right'
             sideOffset={20}
             style={{ zIndex: 9999 }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p className='Text' style={{ marginBottom: 10 }}>
-                Диаграммы
-              </p>
+              <p className='Text pb-2'>Диаграммы</p>
               <fieldset className='Fieldset'>
                 <label>
                   <input type='checkbox' checked={showPlots} onChange={handleShowPlotsChange} />
@@ -85,6 +83,16 @@ export const DiagramsPage = () => {
           rotatable={true}
           pinchable={true}
           pinchOutside={true}
+          edge={true}
+          keepRatio={true}
+          snappable={true}
+          bounds={{
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            position: 'css'
+          }}
           onRender={(e: any) => {
             e.target.style.cssText += e.cssText
           }}
