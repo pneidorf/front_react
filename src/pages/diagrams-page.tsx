@@ -2,16 +2,16 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { diff } from '@egjs/children-differ'
-import { LayersIcon } from '@radix-ui/react-icons'
+import { PieChartIcon } from '@radix-ui/react-icons'
 import * as Popover from '@radix-ui/react-popover'
 import { useRef } from 'react'
 import { useState } from 'react'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
 
-import { Plot } from '~/widgets/plots/ui/plot'
+import { Diagram } from '~/widgets/diagrams/ui/diagram'
 
-export const PlotsPage = () => {
+export const DiagramsPage = () => {
   const [editPlots, setEditPlots] = useState(false)
 
   const [showPlots, setShowPlots] = useState<boolean>(false)
@@ -22,18 +22,18 @@ export const PlotsPage = () => {
   const handleShowPlotsChange = () => {
     setShowPlots(!showPlots)
     if (!showPlots) {
-      console.log('Отображение графиков включено')
+      console.log('Отображение диаграмм включено')
     } else {
-      console.log('Отображение графиков выключено')
+      console.log('Отображение диаграмм выключено')
     }
   }
 
   const handleEditPlotsChange = () => {
     setEditPlots(!editPlots)
     if (!editPlots) {
-      console.log('Редактирование графиков включено')
+      console.log('Редактирование диаграмм включено')
     } else {
-      console.log('Редактирование графиков выключено')
+      console.log('Редактирование диаграмм выключено')
     }
   }
 
@@ -42,7 +42,7 @@ export const PlotsPage = () => {
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
-            <LayersIcon className='h-[50px] w-[50px]' />
+            <PieChartIcon className='h-[50px] w-[50px]' />
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -53,19 +53,17 @@ export const PlotsPage = () => {
             style={{ zIndex: 9999 }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p className='Text' style={{ marginBottom: 10 }}>
-                Графики
-              </p>
+              <p className='Text pb-2'>Диаграммы</p>
               <fieldset className='Fieldset'>
                 <label>
                   <input type='checkbox' checked={showPlots} onChange={handleShowPlotsChange} />
-                  Отобразить графики
+                  Отобразить диаграмму
                 </label>
               </fieldset>
               <fieldset className='Fieldset'>
                 <label>
                   <input type='checkbox' checked={editPlots} onChange={handleEditPlotsChange} />
-                  Редактировать графики
+                  Редактировать диаграмму
                 </label>
               </fieldset>
             </div>
@@ -76,8 +74,7 @@ export const PlotsPage = () => {
       </Popover.Root>
 
       <div>
-        {showPlots && <Plot />}
-
+        {showPlots && <Diagram />}
         <Moveable
           ref={moveableRef}
           target={targets}
@@ -105,9 +102,6 @@ export const PlotsPage = () => {
           onDrag={(e: any) => {
             e.target.style.transform = e.transform
           }}
-          onBound={e => {
-            console.log(e)
-          }}
           onDragGroup={(e: any) => {
             e.events.forEach((ev: any) => {
               ev.target.style.transform = ev.transform
@@ -128,7 +122,7 @@ export const PlotsPage = () => {
         <Selecto
           ref={selectoRef}
           dragContainer={window}
-          selectableTargets={['.map-container-small', '.map-container-form']}
+          selectableTargets={['.diagram-container-small', '.map-container-form']}
           hitRate={0}
           selectByClick={true}
           selectFromInside={false}

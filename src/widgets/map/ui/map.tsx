@@ -1,14 +1,22 @@
-import { Map as MapLibreMap, Marker, NavigationControl } from 'maplibre-gl'
+/* eslint-disable i18next/no-literal-string */
+
+/* eslint-disable react-hooks/exhaustive-deps */
+import { LayersIcon } from '@radix-ui/react-icons'
+import * as Popover from '@radix-ui/react-popover'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useTheme } from 'next-themes'
 import { FC, useEffect, useRef, useState } from 'react'
 
-import { useFetchMarkers } from '~/entities/markers'
+import { JetColorTable } from './rsrptable'
+import { RsrpColorTable } from './rsrptable'
 
 export const Map: FC = () => {
   const [lng] = useState(82.9296)
   const [lat] = useState(55.0152)
   const [zoom] = useState(13)
+  const [selectedLayer, setSelectLayer] = useState(0)
 
   const map = useRef<MapLibreMap | null>(null)
   const mapContainer = useRef(null)
@@ -17,7 +25,7 @@ export const Map: FC = () => {
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
 
   useEffect(() => {
-    if (!mapContainer.current) return
+    if (!mapContainer.current || map.current) return
 
     map.current = new MapLibreMap({
       container: mapContainer.current,
@@ -26,20 +34,162 @@ export const Map: FC = () => {
       style: `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
     })
 
-    const nav = new NavigationControl({
-      visualizePitch: true
+    map.current.on('load', () => {
+      if (map.current) {
+        map.current.addSource('tiles-jet', {
+          type: 'raster',
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/jet/{z}/{x}/{y}`],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'tiles-jet-layer',
+          type: 'raster',
+          source: 'tiles-jet',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
+
+        map.current.addSource('tiles-magma', {
+          type: 'raster',
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/magma/{z}/{x}/{y}`],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'tiles-magma-layer',
+          type: 'raster',
+          source: 'tiles-magma',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
+
+        const nav = new NavigationControl({ visualizePitch: true })
+        map.current.addControl(nav, 'top-left')
+      }
     })
-    map.current.addControl(nav, 'top-left')
   }, [lat, lng, mapStyle, zoom])
 
-  const markers = useFetchMarkers()
-  markers.data?.map(marker => {
-    const el = document.createElement('div')
-    el.className = 'marker'
-    new Marker({ element: el })
-      .setLngLat([marker.lon, marker.lat])
-      .addTo(map.current as MapLibreMap)
-  })
+  const handleLayerChange = (layer: number) => {
+    setSelectLayer(layer)
+    if (!map.current) return
 
-  return <div className='h-full w-full' ref={mapContainer} />
+    map.current.setLayoutProperty('tiles-jet-layer', 'visibility', layer === 1 ? 'visible' : 'none')
+    map.current.setLayoutProperty(
+      'tiles-magma-layer',
+      'visibility',
+      layer === 2 ? 'visible' : 'none'
+    )
+  }
+
+  return (
+    <div className='relative h-full w-full'>
+      <Popover.Root>
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Popover.Trigger asChild>
+                <button className='absolute left-0 top-28 z-10'>
+                  <LayersIcon className='h-[50px] w-[50px]' />
+                </button>
+              </Popover.Trigger>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                className='rounded bg-black px-2 py-1 text-sm text-white'
+                side='right'
+                sideOffset={5}
+              >
+                Слои карты
+                <Tooltip.Arrow className='fill-black' />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+        <Popover.Portal>
+          <Popover.Content
+            className='PopoverContent bg-tertiary'
+            side='right'
+            sideOffset={20}
+            style={{ zIndex: 9999 }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <p className='Text' style={{ marginBottom: 10 }}>
+                Слои карты
+              </p>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='radio'
+                    name='mapLayer'
+                    checked={selectedLayer === 0}
+                    onChange={() => handleLayerChange(0)}
+                  />
+                  Пустая карта
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='radio'
+                    name='mapLayer'
+                    checked={selectedLayer === 1}
+                    onChange={() => handleLayerChange(1)}
+                  />
+                  Значения RSRP - jet
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='radio'
+                    name='mapLayer'
+                    checked={selectedLayer === 2}
+                    onChange={() => handleLayerChange(2)}
+                  />
+                  Значения RSRP - magma
+                </label>
+              </fieldset>
+            </div>
+            <Popover.Close className='PopoverClose' aria-label='Close'></Popover.Close>
+            <Popover.Arrow className='PopoverArrow' />
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+
+      {selectedLayer === 1 && (
+        <Popover.Root>
+          <JetColorTable />
+          <Popover.Portal>
+            <Popover.Content
+              className='PopoverContent'
+              side='top'
+              sideOffset={10}
+              style={{ zIndex: 9999 }}
+            >
+              <Popover.Arrow className='PopoverArrow' />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      )}
+
+      {selectedLayer === 2 && (
+        <Popover.Root>
+          <RsrpColorTable />
+          <Popover.Portal>
+            <Popover.Content
+              className='PopoverContent'
+              side='top'
+              sideOffset={10}
+              style={{ zIndex: 9999 }}
+            >
+              <Popover.Arrow className='PopoverArrow' />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      )}
+
+      <div ref={mapContainer} className='h-full w-full' />
+    </div>
+  )
 }
