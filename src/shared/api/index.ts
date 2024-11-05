@@ -49,6 +49,7 @@ export const api = {
       throw response?.data
     }
   },
+
   async getRSRPQuality(): Promise<MarkerData[]> {
     try {
       // const response = await instance.get('/sockets/getrsrpquality')
