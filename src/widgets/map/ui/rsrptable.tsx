@@ -31,7 +31,7 @@ export const RsrpColorTable = () => {
       <table className='table-auto'>
         <thead>
           <tr>
-            <th className='border px-4 py-2 font-bold'>RSRP</th>
+            <th className='border px-4 py-2 font-bold text-black'>RSRP</th>
           </tr>
         </thead>
         <tbody>
@@ -125,7 +125,7 @@ export const JetColorTable = () => {
       <table className='table-auto'>
         <thead>
           <tr>
-            <th className='border px-4 py-2 font-bold'>RSRP</th>
+            <th className='border px-4 py-2 font-bold text-black'>RSRP</th>
           </tr>
         </thead>
         <tbody>

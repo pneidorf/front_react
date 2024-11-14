@@ -24,8 +24,37 @@ export const Map: FC = () => {
   const { theme } = useTheme()
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
 
+  const handleLayerVisibility = () => {
+    if (!map.current) return
+    map.current.setLayoutProperty(
+      'tiles-jet-layer',
+      'visibility',
+      selectedLayer === 1 ? 'visible' : 'none'
+    )
+    map.current.setLayoutProperty(
+      'tiles-magma-layer',
+      'visibility',
+      selectedLayer === 2 ? 'visible' : 'none'
+    )
+    map.current.setLayoutProperty(
+      'rsrq-tiles-jet-layer',
+      'visibility',
+      selectedLayer === 3 ? 'visible' : 'none'
+    )
+    map.current.setLayoutProperty(
+      'rsrq-tiles-magma-layer',
+      'visibility',
+      selectedLayer === 4 ? 'visible' : 'none'
+    )
+  }
+
   useEffect(() => {
-    if (!mapContainer.current || map.current) return
+    if (!mapContainer.current) return
+
+    if (map.current) {
+      map.current.remove()
+      map.current = null
+    }
 
     map.current = new MapLibreMap({
       container: mapContainer.current,
@@ -38,7 +67,7 @@ export const Map: FC = () => {
       if (map.current) {
         map.current.addSource('tiles-jet', {
           type: 'raster',
-          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/jet/{z}/{x}/{y}`],
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/rsrp/jet/{z}/{x}/{y}`],
           tileSize: 256
         })
         map.current.addLayer({
@@ -52,7 +81,7 @@ export const Map: FC = () => {
 
         map.current.addSource('tiles-magma', {
           type: 'raster',
-          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/magma/{z}/{x}/{y}`],
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/rsrp/magma/{z}/{x}/{y}`],
           tileSize: 256
         })
         map.current.addLayer({
@@ -64,11 +93,40 @@ export const Map: FC = () => {
           layout: { visibility: 'none' }
         })
 
+        map.current.addSource('rsrq-tiles-jet', {
+          type: 'raster',
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/rsrq/jet/{z}/{x}/{y}`],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'rsrq-tiles-jet-layer',
+          type: 'raster',
+          source: 'rsrq-tiles-jet',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
+
+        map.current.addSource('rsrq-tiles-magma', {
+          type: 'raster',
+          tiles: [`${import.meta.env.VITE_API_TILES}/tiles/rsrq/magma/{z}/{x}/{y}`],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'rsrq-tiles-magma-layer',
+          type: 'raster',
+          source: 'rsrq-tiles-magma',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
+
         const nav = new NavigationControl({ visualizePitch: true })
         map.current.addControl(nav, 'top-left')
+        handleLayerVisibility()
       }
     })
-  }, [lat, lng, mapStyle, zoom])
+  }, [lat, lng, mapStyle, zoom, theme])
 
   const handleLayerChange = (layer: number) => {
     setSelectLayer(layer)
@@ -79,6 +137,16 @@ export const Map: FC = () => {
       'tiles-magma-layer',
       'visibility',
       layer === 2 ? 'visible' : 'none'
+    )
+    map.current.setLayoutProperty(
+      'rsrq-tiles-jet-layer',
+      'visibility',
+      layer === 3 ? 'visible' : 'none'
+    )
+    map.current.setLayoutProperty(
+      'rsrq-tiles-magma-layer',
+      'visibility',
+      layer === 4 ? 'visible' : 'none'
     )
   }
 
@@ -148,6 +216,28 @@ export const Map: FC = () => {
                     onChange={() => handleLayerChange(2)}
                   />
                   Значения RSRP - magma
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='radio'
+                    name='mapLayer'
+                    checked={selectedLayer === 3}
+                    onChange={() => handleLayerChange(3)}
+                  />
+                  Значения RSRQ - jet
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='radio'
+                    name='mapLayer'
+                    checked={selectedLayer === 4}
+                    onChange={() => handleLayerChange(4)}
+                  />
+                  Значения RSRQ - magma
                 </label>
               </fieldset>
             </div>
