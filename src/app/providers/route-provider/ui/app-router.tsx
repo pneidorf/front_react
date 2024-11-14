@@ -1,7 +1,8 @@
 import { memo, useCallback } from 'react'
+import { Suspense } from 'react'
 import { Route, RouteProps, Routes } from 'react-router-dom'
 
-import { routeConfig } from '~/shared/config'
+import { routeConfig } from '~/shared/config/'
 
 export const AppRouter = memo(() => {
   const renderWithWrapper = useCallback(
@@ -9,5 +10,10 @@ export const AppRouter = memo(() => {
     []
   )
 
-  return <Routes>{Object.values(routeConfig).map(renderWithWrapper)}</Routes>
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      {' '}
+      <Routes>{Object.values(routeConfig).map(renderWithWrapper)}</Routes>
+    </Suspense>
+  )
 })
