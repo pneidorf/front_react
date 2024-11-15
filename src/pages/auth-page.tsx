@@ -7,7 +7,8 @@ import Mobile from '../shared/assets/svg/auth/Mobile.svg?react'
 import MapMobile from '../shared/assets/svg/auth/mapMobile.svg?react'
 
 import { LoginForm, RegistrationForm } from '~/features/auth/ui/auth'
-import LogoIcon from '~/shared/assets/images/logo.png'
+
+// import LogoIcon from '~/shared/assets/images/logo.png'
 
 // eslint-disable-next-line i18next/no-literal-string
 export const AuthPage = memo(() => {
@@ -64,7 +65,7 @@ export const AuthPage = memo(() => {
       <div className='grid basis-1/2 grid-rows-7 bg-[#ffffff]'>
         <div className='row-start-2 grid justify-center'>
           {/* <p className='text-2xl h-[172px] w-[172px]'> */}
-          <img className='h-[120px] min-w-[120px]' src={LogoIcon} />
+          {/* <img className='h-[120px] min-w-[120px]' src={LogoIcon} /> */}
           {/* </p> */}
         </div>
         <div className='h-100 row-span-3 row-start-3 grid justify-center'>
