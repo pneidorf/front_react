@@ -149,3 +149,151 @@ export const JetColorTable = () => {
     </div>
   )
 }
+
+export const RSRQJetTable = () => {
+  const colorRanges = [
+    {
+      range: '-20 дБ',
+      gradientColors: [
+        'rgba(0, 0, 127, 255)',
+        'rgba(0, 0, 186, 255)',
+        'rgba(0, 0, 245, 255)',
+        'rgba(0, 32, 255, 255)',
+        'rgba(0, 84, 255, 255)',
+        'rgba(0, 140, 255, 255)'
+      ]
+    },
+    {
+      range: '-15 дБ',
+      gradientColors: [
+        'rgba(0, 192, 255, 255)',
+        'rgba(15, 248, 231, 255)',
+        'rgba(57, 255, 189, 255)',
+        'rgba(102, 255, 144, 255)',
+        'rgba(144, 255, 102, 255)'
+      ]
+    },
+    {
+      range: '-10 дБ',
+      gradientColors: [
+        'rgba(189, 255, 57, 255)',
+        'rgba(231, 255, 15, 255)',
+        'rgba(255, 211, 0, 255)',
+        'rgba(255, 163, 0, 255)',
+        'rgba(255, 111, 0, 255)'
+      ]
+    },
+    {
+      range: '-5 дБ',
+      gradientColors: [
+        'rgba(255, 63, 0, 255)',
+        'rgba(245, 11, 0, 255)',
+        'rgba(186, 0, 0, 255)',
+        'rgba(127, 0, 0, 255)'
+      ]
+    }
+  ]
+
+  return (
+    <div className='absolute right-10 top-[38rem] z-20 bg-white shadow-md'>
+      <table className='table-auto'>
+        <thead>
+          <tr>
+            <th className='border px-4 py-2 font-bold text-black'>RSRQ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {colorRanges.map((item, index) => (
+            <tr key={index}>
+              <td
+                className='border px-4 py-2 font-bold'
+                style={{
+                  background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
+                  color: item.range === '-20 дБ' ? '#FFFFFF' : '#000000',
+                  height: '50px',
+                  textAlign: 'center'
+                }}
+              >
+                {item.range}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export const RSRQMagmaTable = () => {
+  const colorRanges = [
+    {
+      range: '-20 дБ',
+      gradientColors: [
+        'rgba(0, 0, 3, 255)',
+        'rgba(7, 5, 27, 255)',
+        'rgba(21, 14, 56, 255)',
+        'rgba(40, 17, 89, 255)',
+        'rgba(62, 15, 114, 255)',
+        'rgba(85, 19, 125, 255)'
+      ]
+    },
+    {
+      range: '-15 дБ',
+      gradientColors: [
+        'rgba(105, 28, 128, 255)',
+        'rgba(127, 36, 129, 255)',
+        'rgba(148, 43, 128, 255)',
+        'rgba(171, 51, 124, 255)',
+        'rgba(192, 58, 117, 255)'
+      ]
+    },
+    {
+      range: '-10 дБ',
+      gradientColors: [
+        'rgba(214, 68, 108, 255)',
+        'rgba(231, 82, 98, 255)',
+        'rgba(244, 104, 91, 255)',
+        'rgba(250, 128, 94, 255)',
+        'rgba(253, 155, 106, 255)'
+      ]
+    },
+    {
+      range: '-5 дБ',
+      gradientColors: [
+        'rgba(254, 179, 123, 255)',
+        'rgba(253, 205, 144, 255)',
+        'rgba(252, 229, 166, 255)',
+        'rgba(251, 252, 191, 255)'
+      ]
+    }
+  ]
+
+  return (
+    <div className='absolute right-10 top-[38rem] z-20 bg-white shadow-md'>
+      <table className='table-auto'>
+        <thead>
+          <tr>
+            <th className='border px-4 py-2 font-bold text-black'>RSRQ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {colorRanges.map((item, index) => (
+            <tr key={index}>
+              <td
+                className='border px-4 py-2 font-bold'
+                style={{
+                  background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
+                  color: item.range === '-20 дБ' ? '#FFFFFF' : '#000000',
+                  height: '50px',
+                  textAlign: 'center'
+                }}
+              >
+                {item.range}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
