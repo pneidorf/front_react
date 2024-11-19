@@ -19,10 +19,10 @@ export const instance = axios.create({
 
 export const instance_rsrp = axios.create({
   baseURL: import.meta.env.VITE_API_RSRP,
-  withCredentials: true,
+  // withCredentials: true,
   headers: {
-    // 'Access-Control-Allow-Origin': '*',
-    // 'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Origin': '*',
+    // 'Access-Control-Allow-Credentials': false,
     'Content-Type': 'application/json'
   }
 })
@@ -50,21 +50,45 @@ export const api = {
     }
   },
 
-  async getRSRPQuality(): Promise<MarkerData[]> {
-    try {
-      // const response = await instance.get('/sockets/getrsrpquality')
-      const response = await instance_rsrp.get('/sockets/getrsrpquality')
+  // async getRSRPQuality(): Promise<MarkerData[]> {
+  //   try {
+  //     // const response = await instance.get('/sockets/getrsrpquality')
+  //     const response = await instance_rsrp.get('/sockets/getrsrpquality')
 
-      // const { token } = response.data
-      // localStorage.setItem('token', token)
-      // const filteredData = response.data.filter((_: never, index: number) => index % 80 === 0)
-      // return filteredData.data
+  //     // const { token } = response.data
+  //     // localStorage.setItem('token', token)
+  //     // const filteredData = response.data.filter((_: never, index: number) => index % 80 === 0)
+  //     // return filteredData.data
+  //     return response.data
+  //   } catch (error) {
+  //     const { response } = error as AxiosError
+  //     throw response?.data
+  //   }
+  // },
+  async getRSRPQuality(timestart: string, timeend: string): Promise<MarkerData[]> {
+    try {
+      const endpoint = `/v1/filter/ltequality/${timestart}/${timeend}`
+      const response = await instance_rsrp.get(endpoint)
+
       return response.data
     } catch (error) {
       const { response } = error as AxiosError
       throw response?.data
     }
   },
+
+  async getInfoQuality(params: string) {
+    try {
+      const endpoint = `/v1/filter/data/${params}`
+      const response = await instance_rsrp.get(endpoint)
+
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+
   async getAppTraffic(): Promise<DiagramsData[]> {
     try {
       // const response = await instance.get('/sockets/getrsrpquality')
@@ -83,7 +107,9 @@ export const api = {
   async login({ email, password }: { email: string; password: string }) {
     try {
       // /user/auth
-      const response = await instance.post('/v1/auth/login', { email, password })
+      // const response = await instance.post('/v1/auth/login', { email, password })
+      const response = await instance.post('/v1/auth/signin', { email, password })
+
       const { jwt } = response.data
       localStorage.setItem('token', jwt)
       // console.log(response.data)
@@ -115,7 +141,7 @@ export const api = {
   async register({ email, password }: { email: string; password: string }) {
     try {
       // /user/register
-      const response = await instance.post('/v1/auth/register', { email, password })
+      const response = await instance.post('/v1/auth/signup', { email, password })
 
       // const { token } = response.data
       // localStorage.setItem('token', token)

@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -12,10 +11,14 @@ import {
 
 import { useFetchMarkers } from '~/entities/markers'
 
-export const Plot = () => {
-  const { data: markersData } = useFetchMarkers()
+interface PlotProps {
+  timeStart: string
+  timeEnd: string
+}
 
-  // Фильтруем данные, чтобы оставить только каждую 10-ю запись
+export const Plot = ({ timeStart, timeEnd }: PlotProps) => {
+  const { data: markersData } = useFetchMarkers(timeStart, timeEnd)
+
   const filteredData = markersData?.filter((_, index) => index % 80 === 0)
 
   return (
