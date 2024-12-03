@@ -61,8 +61,8 @@ export const PlotsPage = () => {
       // const response = await fetch(`${VITE_API_URL}/v1/filter/data/${params}`)
       const response = await api.getInfoQuality(`${params}`)
 
-      const data = await response.json()
-      setResponseData(data)
+      // const data = await response.json()
+      setResponseData(response)
     } catch (error) {
       console.error('Ошибка запроса:', error)
     } finally {

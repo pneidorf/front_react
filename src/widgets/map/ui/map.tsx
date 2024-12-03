@@ -10,16 +10,19 @@ import { useTheme } from 'next-themes'
 import { FC, useEffect, useRef, useState } from 'react'
 
 import { JetColorTable } from './rsrptable'
-import { RsrpColorTable } from './rsrptable'
+// import { RsrpColorTable } from './rsrptable'
 import { RSRQJetTable } from './rsrptable'
-import { RSRQMagmaTable } from './rsrptable'
+import { PCIMod3Table } from './rsrptable'
+import { PCIMod6Table } from './rsrptable'
+
+// import { RSRQMagmaTable } from './rsrptable'
 
 export const Map: FC = () => {
   const [lng] = useState(82.9296)
   const [lat] = useState(55.0152)
   const [zoom] = useState(13)
   const [selectedLayer, setSelectLayer] = useState(0)
-  const [operator, setOperator] = useState('all') // Новое состояние для оператора
+  const [operator, setOperator] = useState('all')
 
   const map = useRef<MapLibreMap | null>(null)
   const mapContainer = useRef(null)
@@ -37,36 +40,29 @@ export const Map: FC = () => {
       'visibility',
       selectedLayer === 1 ? 'visible' : 'none'
     )
-    map.current.setLayoutProperty(
-      'tiles-magma-layer',
-      'visibility',
-      selectedLayer === 2 ? 'visible' : 'none'
-    )
+
     map.current.setLayoutProperty(
       'rsrq-tiles-jet-layer',
       'visibility',
+      selectedLayer === 2 ? 'visible' : 'none'
+    )
+
+    map.current.setLayoutProperty(
+      'pci-tiles-jet-layer',
+      'visibility',
       selectedLayer === 3 ? 'visible' : 'none'
     )
+
     map.current.setLayoutProperty(
-      'rsrq-tiles-magma-layer',
+      'pci-mod-3-tiles-jet-layer',
       'visibility',
       selectedLayer === 4 ? 'visible' : 'none'
     )
-    // map.current.setLayoutProperty(
-    //   'pci-tiles-jet-layer',
-    //   'visibility',
-    //   selectedLayer === 5 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-tiles-magma-layer',
-    //   'visibility',
-    //   selectedLayer === 6 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-mod-3-tiles-jet-layer',
-    //   'visibility',
-    //   selectedLayer === 7 ? 'visible' : 'none'
-    // )
+    map.current.setLayoutProperty(
+      'pci-mod-6-tiles-jet-layer',
+      'visibility',
+      selectedLayer === 5 ? 'visible' : 'none'
+    )
     // map.current.setLayoutProperty(
     //   'pci-mod-3-tiles-magma-layer',
     //   'visibility',
@@ -115,19 +111,19 @@ export const Map: FC = () => {
           layout: { visibility: 'none' }
         })
 
-        map.current.addSource('tiles-magma', {
-          type: 'raster',
-          tiles: [getTileUrl('rsrp', 'magma')],
-          tileSize: 256
-        })
-        map.current.addLayer({
-          id: 'tiles-magma-layer',
-          type: 'raster',
-          source: 'tiles-magma',
-          minzoom: 8,
-          maxzoom: 20,
-          layout: { visibility: 'none' }
-        })
+        // map.current.addSource('tiles-magma', {
+        //   type: 'raster',
+        //   tiles: [getTileUrl('rsrp', 'magma')],
+        //   tileSize: 256
+        // })
+        // map.current.addLayer({
+        //   id: 'tiles-magma-layer',
+        //   type: 'raster',
+        //   source: 'tiles-magma',
+        //   minzoom: 8,
+        //   maxzoom: 20,
+        //   layout: { visibility: 'none' }
+        // })
 
         map.current.addSource('rsrq-tiles-jet', {
           type: 'raster',
@@ -143,33 +139,33 @@ export const Map: FC = () => {
           layout: { visibility: 'none' }
         })
 
-        map.current.addSource('rsrq-tiles-magma', {
-          type: 'raster',
-          tiles: [getTileUrl('rsrq', 'magma')],
-          tileSize: 256
-        })
-        map.current.addLayer({
-          id: 'rsrq-tiles-magma-layer',
-          type: 'raster',
-          source: 'rsrq-tiles-magma',
-          minzoom: 8,
-          maxzoom: 20,
-          layout: { visibility: 'none' }
-        })
-
-        // map.current.addSource('pci-tiles-jet', {
+        // map.current.addSource('rsrq-tiles-magma', {
         //   type: 'raster',
-        //   tiles: [getTileUrl('pci', 'jet')],
+        //   tiles: [getTileUrl('rsrq', 'magma')],
         //   tileSize: 256
         // })
         // map.current.addLayer({
-        //   id: 'pci-tiles-jet-layer',
+        //   id: 'rsrq-tiles-magma-layer',
         //   type: 'raster',
-        //   source: 'pci-tiles-jet',
+        //   source: 'rsrq-tiles-magma',
         //   minzoom: 8,
         //   maxzoom: 20,
         //   layout: { visibility: 'none' }
         // })
+
+        map.current.addSource('pci-tiles-jet', {
+          type: 'raster',
+          tiles: [getTileUrl('pci', 'jet')],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'pci-tiles-jet-layer',
+          type: 'raster',
+          source: 'pci-tiles-jet',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
 
         // map.current.addSource('pci-tiles-magma', {
         //   type: 'raster',
@@ -186,19 +182,19 @@ export const Map: FC = () => {
         // })
 
         // // PCI % 3
-        // map.current.addSource('pci-mod-3-tiles-jet', {
-        //   type: 'raster',
-        //   tiles: [getTileUrl('pci_mod_3', 'jet')],
-        //   tileSize: 256
-        // })
-        // map.current.addLayer({
-        //   id: 'pci-mod-3-tiles-jet-layer',
-        //   type: 'raster',
-        //   source: 'pci-mod-3-tiles-jet',
-        //   minzoom: 8,
-        //   maxzoom: 20,
-        //   layout: { visibility: 'none' }
-        // })
+        map.current.addSource('pci-mod-3-tiles-jet', {
+          type: 'raster',
+          tiles: [getTileUrl('pci_mod_3', 'jet')],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'pci-mod-3-tiles-jet-layer',
+          type: 'raster',
+          source: 'pci-mod-3-tiles-jet',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
 
         // map.current.addSource('pci-mod-3-tiles-magma', {
         //   type: 'raster',
@@ -215,19 +211,19 @@ export const Map: FC = () => {
         // })
 
         // // PCI % 6
-        // map.current.addSource('pci-mod-6-tiles-jet', {
-        //   type: 'raster',
-        //   tiles: [getTileUrl('pci_mod_6', 'jet')],
-        //   tileSize: 256
-        // })
-        // map.current.addLayer({
-        //   id: 'pci-mod-6-tiles-jet-layer',
-        //   type: 'raster',
-        //   source: 'pci-mod-6-tiles-jet',
-        //   minzoom: 8,
-        //   maxzoom: 20,
-        //   layout: { visibility: 'none' }
-        // })
+        map.current.addSource('pci-mod-6-tiles-jet', {
+          type: 'raster',
+          tiles: [getTileUrl('pci_mod_6', 'jet')],
+          tileSize: 256
+        })
+        map.current.addLayer({
+          id: 'pci-mod-6-tiles-jet-layer',
+          type: 'raster',
+          source: 'pci-mod-6-tiles-jet',
+          minzoom: 8,
+          maxzoom: 20,
+          layout: { visibility: 'none' }
+        })
 
         // map.current.addSource('pci-mod-6-tiles-magma', {
         //   type: 'raster',
@@ -255,51 +251,30 @@ export const Map: FC = () => {
     if (!map.current) return
 
     map.current.setLayoutProperty('tiles-jet-layer', 'visibility', layer === 1 ? 'visible' : 'none')
-    map.current.setLayoutProperty(
-      'tiles-magma-layer',
-      'visibility',
-      layer === 2 ? 'visible' : 'none'
-    )
+
     map.current.setLayoutProperty(
       'rsrq-tiles-jet-layer',
       'visibility',
+      layer === 2 ? 'visible' : 'none'
+    )
+
+    map.current.setLayoutProperty(
+      'pci-tiles-jet-layer',
+      'visibility',
       layer === 3 ? 'visible' : 'none'
     )
+
     map.current.setLayoutProperty(
-      'rsrq-tiles-magma-layer',
+      'pci-mod-3-tiles-jet-layer',
       'visibility',
       layer === 4 ? 'visible' : 'none'
     )
-    // map.current.setLayoutProperty(
-    //   'pci-tiles-jet-layer',
-    //   'visibility',
-    //   selectedLayer === 5 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-tiles-magma-layer',
-    //   'visibility',
-    //   selectedLayer === 6 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-mod-3-tiles-jet-layer',
-    //   'visibility',
-    //   selectedLayer === 7 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-mod-3-tiles-magma-layer',
-    //   'visibility',
-    //   selectedLayer === 8 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-mod-6-tiles-jet-layer',
-    //   'visibility',
-    //   selectedLayer === 9 ? 'visible' : 'none'
-    // )
-    // map.current.setLayoutProperty(
-    //   'pci-mod-6-tiles-magma-layer',
-    //   'visibility',
-    //   selectedLayer === 10 ? 'visible' : 'none'
-    // )
+
+    map.current.setLayoutProperty(
+      'pci-mod-6-tiles-jet-layer',
+      'visibility',
+      layer === 5 ? 'visible' : 'none'
+    )
   }
 
   return (
@@ -372,6 +347,7 @@ export const Map: FC = () => {
                   Значения RSRP - jet
                 </label>
               </fieldset>
+
               <fieldset className='Fieldset'>
                 <label>
                   <input
@@ -380,9 +356,10 @@ export const Map: FC = () => {
                     checked={selectedLayer === 2}
                     onChange={() => handleLayerChange(2)}
                   />
-                  Значения RSRP - magma
+                  Значения RSRQ - jet
                 </label>
               </fieldset>
+
               <fieldset className='Fieldset'>
                 <label>
                   <input
@@ -391,7 +368,7 @@ export const Map: FC = () => {
                     checked={selectedLayer === 3}
                     onChange={() => handleLayerChange(3)}
                   />
-                  Значения RSRQ - jet
+                  Значения PCI - jet
                 </label>
               </fieldset>
               <fieldset className='Fieldset'>
@@ -402,39 +379,6 @@ export const Map: FC = () => {
                     checked={selectedLayer === 4}
                     onChange={() => handleLayerChange(4)}
                   />
-                  Значения RSRQ - magma
-                </label>
-              </fieldset>
-              {/* <fieldset className='Fieldset'>
-                <label>
-                  <input
-                    type='radio'
-                    name='mapLayer'
-                    checked={selectedLayer === 5}
-                    onChange={() => handleLayerChange(5)}
-                  />
-                  Значения PCI - jet
-                </label>
-              </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
-                  <input
-                    type='radio'
-                    name='mapLayer'
-                    checked={selectedLayer === 6}
-                    onChange={() => handleLayerChange(6)}
-                  />
-                  Значения PCI - magma
-                </label>
-              </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
-                  <input
-                    type='radio'
-                    name='mapLayer'
-                    checked={selectedLayer === 7}
-                    onChange={() => handleLayerChange(7)}
-                  />
                   Значения PCI % 3 - jet
                 </label>
               </fieldset>
@@ -443,34 +387,12 @@ export const Map: FC = () => {
                   <input
                     type='radio'
                     name='mapLayer'
-                    checked={selectedLayer === 8}
-                    onChange={() => handleLayerChange(8)}
-                  />
-                  Значения PCI % 3 - magma
-                </label>
-              </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
-                  <input
-                    type='radio'
-                    name='mapLayer'
-                    checked={selectedLayer === 9}
-                    onChange={() => handleLayerChange(9)}
+                    checked={selectedLayer === 5}
+                    onChange={() => handleLayerChange(5)}
                   />
                   Значения PCI % 6 - jet
                 </label>
               </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
-                  <input
-                    type='radio'
-                    name='mapLayer'
-                    checked={selectedLayer === 10}
-                    onChange={() => handleLayerChange(10)}
-                  />
-                  Значения PCI % 6 - magma
-                </label>
-              </fieldset> */}
             </div>
             <Popover.Close className='PopoverClose' aria-label='Close'></Popover.Close>
             <Popover.Arrow className='PopoverArrow' />
@@ -496,21 +418,6 @@ export const Map: FC = () => {
 
       {selectedLayer === 2 && (
         <Popover.Root>
-          <RsrpColorTable />
-          <Popover.Portal>
-            <Popover.Content
-              className='PopoverContent'
-              side='top'
-              sideOffset={10}
-              style={{ zIndex: 9999 }}
-            >
-              <Popover.Arrow className='PopoverArrow' />
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-      )}
-      {selectedLayer === 3 && (
-        <Popover.Root>
           <RSRQJetTable />
           <Popover.Portal>
             <Popover.Content
@@ -527,7 +434,23 @@ export const Map: FC = () => {
 
       {selectedLayer === 4 && (
         <Popover.Root>
-          <RSRQMagmaTable />
+          <PCIMod3Table />
+          <Popover.Portal>
+            <Popover.Content
+              className='PopoverContent'
+              side='top'
+              sideOffset={10}
+              style={{ zIndex: 9999 }}
+            >
+              <Popover.Arrow className='PopoverArrow' />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      )}
+
+      {selectedLayer === 5 && (
+        <Popover.Root>
+          <PCIMod6Table />
           <Popover.Portal>
             <Popover.Content
               className='PopoverContent'
