@@ -16,7 +16,7 @@ interface PlotProps {
   timeEnd: string
 }
 
-export const Plot = ({ timeStart, timeEnd }: PlotProps) => {
+export const PlotRSRQ = ({ timeStart, timeEnd }: PlotProps) => {
   const { data: markersData } = useFetchMarkers(timeStart, timeEnd)
 
   const filteredData = markersData
@@ -24,7 +24,7 @@ export const Plot = ({ timeStart, timeEnd }: PlotProps) => {
       const lteData = marker.lte && marker.lte.length > 0 ? marker.lte[0] : null
       return {
         time: new Date(marker.CreatedAt).toISOString(),
-        rsrp: lteData ? lteData.rsrp : null
+        rsrq: lteData ? lteData.rsrq : null
       }
     })
     .filter((_, index) => index % 80 === 0)
@@ -36,10 +36,10 @@ export const Plot = ({ timeStart, timeEnd }: PlotProps) => {
           <LineChart width={500} height={300} data={filteredData}>
             <CartesianGrid strokeDasharray='3 3' />
             <XAxis dataKey='time' />
-            <YAxis domain={[-150, 'dataMax + 50']} />
+            <YAxis domain={[-30, 0]} />
             <Tooltip />
             <Legend />
-            <Line type='monotone' dataKey='rsrp' stroke='#8884d8' activeDot={{ r: 8 }} />
+            <Line type='monotone' dataKey='rsrq' stroke='#8884d8' activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

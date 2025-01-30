@@ -4,22 +4,31 @@
 import { diff } from '@egjs/children-differ'
 import { LayersIcon } from '@radix-ui/react-icons'
 import * as Popover from '@radix-ui/react-popover'
-import { useRef } from 'react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Modal from 'react-modal'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
 
 import { api } from '~/shared/api'
+import { HistogramRSRP } from '~/widgets/plots/ui/histogram'
+import { HistogramRSRQ } from '~/widgets/plots/ui/histogram'
 import { Plot } from '~/widgets/plots/ui/plot'
+import { PlotRSRQ } from '~/widgets/plots/ui/plotRSRQ'
 
 Modal.setAppElement('#root')
+
 export const PlotsPage = () => {
   const [editPlots, setEditPlots] = useState(false)
   const [showPlots, setShowPlots] = useState<boolean>(false)
+  const [showPlotsRSRQ, setShowPlotsRSRQ] = useState<boolean>(false)
+  const [showHistogramRSRP, setShowHistogramRSRP] = useState<boolean>(false)
+  const [showHistogramRSRQ, setShowHistogramRSRQ] = useState<boolean>(false)
   const [showInfo, setShowInfo] = useState<boolean>(false)
   const [targets, setTargets] = useState<HTMLElement[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isPlotsModalOpen, setIsPlotsModalOpen] = useState(false)
+  const [isPlotsRSRQModalOpen, setIsPlotsRSRQModalOpen] = useState(false)
+  const [isHistogramRSRPModalOpen, setIsHistogramRSRPModalOpen] = useState(false)
+  const [isHistogramRSRQModalOpen, setIsHistogramRSRQModalOpen] = useState(false)
   const [timeStart, setTimeStart] = useState('')
   const [timeEnd, setTimeEnd] = useState('')
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
@@ -50,7 +59,6 @@ export const PlotsPage = () => {
   }
 
   const handleApplyInfo = async () => {
-    // Формируем URL из введенных значений
     const params = Object.entries(inputValues)
       .filter(([, value]) => value)
       .map(([key, value]) => `${key}-${value}`)
@@ -58,10 +66,7 @@ export const PlotsPage = () => {
 
     setShowInfo(true)
     try {
-      // const response = await fetch(`${VITE_API_URL}/v1/filter/data/${params}`)
       const response = await api.getInfoQuality(`${params}`)
-
-      // const data = await response.json()
       setResponseData(response)
     } catch (error) {
       console.error('Ошибка запроса:', error)
@@ -69,31 +74,95 @@ export const PlotsPage = () => {
       setIsInfoModalOpen(false)
     }
   }
+
   const handleShowPlotsChange = () => {
     if (!showPlots) {
-      setIsModalOpen(true)
+      setIsPlotsModalOpen(true)
     } else {
       setShowPlots(false)
     }
   }
-  const handleModalApply = () => {
+
+  const handleShowPlotsRSRQChange = () => {
+    if (!showPlotsRSRQ) {
+      setIsPlotsRSRQModalOpen(true)
+    } else {
+      setShowPlotsRSRQ(false)
+    }
+  }
+
+  const handleShowHistogramRSRPChange = () => {
+    if (!showHistogramRSRP) {
+      setIsHistogramRSRPModalOpen(true)
+    } else {
+      setShowHistogramRSRP(false)
+    }
+  }
+
+  const handleShowHistogramRSRQChange = () => {
+    if (!showHistogramRSRQ) {
+      setIsHistogramRSRQModalOpen(true)
+    } else {
+      setShowHistogramRSRQ(false)
+    }
+  }
+
+  const handlePlotsModalApply = () => {
     const formattedTimeStart = new Date(timeStart).toISOString()
     const formattedTimeEnd = new Date(timeEnd).toISOString()
 
-    // Логика для отображения графиков с отформатированными значениями
-    console.log(`Время начала: ${formattedTimeStart}`)
-    console.log(`Время конца: ${formattedTimeEnd}`)
+    console.log(
+      `График RSRP: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
+    )
 
     setTimeStart(formattedTimeStart)
     setTimeEnd(formattedTimeEnd)
-    setIsModalOpen(false)
+    setIsPlotsModalOpen(false)
     setShowPlots(true)
   }
 
-  const handleModalCancel = () => {
-    setIsModalOpen(false)
-    setShowPlots(false)
+  const handlePlotsRSRQModalApply = () => {
+    const formattedTimeStart = new Date(timeStart).toISOString()
+    const formattedTimeEnd = new Date(timeEnd).toISOString()
+
+    console.log(
+      `График RSRQ: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
+    )
+
+    setTimeStart(formattedTimeStart)
+    setTimeEnd(formattedTimeEnd)
+    setIsPlotsRSRQModalOpen(false)
+    setShowPlotsRSRQ(true)
   }
+
+  const handleHistogramRSRPModalApply = () => {
+    const formattedTimeStart = new Date(timeStart).toISOString()
+    const formattedTimeEnd = new Date(timeEnd).toISOString()
+
+    console.log(
+      `Гистограмма RSRP: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
+    )
+
+    setTimeStart(formattedTimeStart)
+    setTimeEnd(formattedTimeEnd)
+    setIsHistogramRSRPModalOpen(false)
+    setShowHistogramRSRP(true)
+  }
+
+  const handleHistogramRSRQModalApply = () => {
+    const formattedTimeStart = new Date(timeStart).toISOString()
+    const formattedTimeEnd = new Date(timeEnd).toISOString()
+
+    console.log(
+      `Гистограмма RSRQ: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
+    )
+
+    setTimeStart(formattedTimeStart)
+    setTimeEnd(formattedTimeEnd)
+    setIsHistogramRSRQModalOpen(false)
+    setShowHistogramRSRQ(true)
+  }
+
   const handleEditPlotsChange = () => {
     setEditPlots(!editPlots)
     if (!editPlots) {
@@ -102,6 +171,7 @@ export const PlotsPage = () => {
       console.log('Редактирование графиков выключено')
     }
   }
+
   const handleShowInfoChange = () => {
     if (!showInfo) {
       setIsInfoModalOpen(true)
@@ -137,6 +207,36 @@ export const PlotsPage = () => {
               </fieldset>
               <fieldset className='Fieldset'>
                 <label>
+                  <input
+                    type='checkbox'
+                    checked={showPlotsRSRQ}
+                    onChange={handleShowPlotsRSRQChange}
+                  />
+                  Отобразить график RSRQ
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='checkbox'
+                    checked={showHistogramRSRP}
+                    onChange={handleShowHistogramRSRPChange}
+                  />
+                  Отобразить гистограмму RSRP
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
+                  <input
+                    type='checkbox'
+                    checked={showHistogramRSRQ}
+                    onChange={handleShowHistogramRSRQChange}
+                  />
+                  Отобразить гистограмму RSRQ
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label>
                   <input type='checkbox' checked={editPlots} onChange={handleEditPlotsChange} />
                   Редактировать графики
                 </label>
@@ -153,13 +253,15 @@ export const PlotsPage = () => {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
+
+      {/* Модальное окно для графика RSRP */}
       <Modal
-        isOpen={isModalOpen}
-        onRequestClose={handleModalCancel}
+        isOpen={isPlotsModalOpen}
+        onRequestClose={() => setIsPlotsModalOpen(false)}
         className='modal-content'
         overlayClassName='modal-overlay'
       >
-        <h2 className='mb-4 text-lg font-bold'>Укажите период времени</h2>
+        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для графика RSRP</h2>
         <form className='space-y-4'>
           <div>
             <label htmlFor='timeStart' className='mb-1 block font-medium'>
@@ -189,20 +291,177 @@ export const PlotsPage = () => {
             <button
               type='button'
               className='rounded bg-gray-300 px-4 py-2'
-              onClick={handleModalCancel}
+              onClick={() => setIsPlotsModalOpen(false)}
             >
               Отменить
             </button>
             <button
               type='button'
               className='rounded bg-blue-500 px-4 py-2 text-white'
-              onClick={handleModalApply}
+              onClick={handlePlotsModalApply}
             >
               Применить
             </button>
           </div>
         </form>
       </Modal>
+
+      {/* Модальное окно для графика RSRQ */}
+      <Modal
+        isOpen={isPlotsRSRQModalOpen}
+        onRequestClose={() => setIsPlotsRSRQModalOpen(false)}
+        className='modal-content'
+        overlayClassName='modal-overlay'
+      >
+        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для графика RSRQ</h2>
+        <form className='space-y-4'>
+          <div>
+            <label htmlFor='timeStart' className='mb-1 block font-medium'>
+              Дата начала
+            </label>
+            <input
+              type='datetime-local'
+              id='timeStart'
+              value={timeStart}
+              onChange={e => setTimeStart(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div>
+            <label htmlFor='timeEnd' className='mb-1 block font-medium'>
+              Дата конца
+            </label>
+            <input
+              type='datetime-local'
+              id='timeEnd'
+              value={timeEnd}
+              onChange={e => setTimeEnd(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div className='flex justify-end space-x-4'>
+            <button
+              type='button'
+              className='rounded bg-gray-300 px-4 py-2'
+              onClick={() => setIsPlotsRSRQModalOpen(false)}
+            >
+              Отменить
+            </button>
+            <button
+              type='button'
+              className='rounded bg-blue-500 px-4 py-2 text-white'
+              onClick={handlePlotsRSRQModalApply}
+            >
+              Применить
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Модальное окно для гистограммы RSRP */}
+      <Modal
+        isOpen={isHistogramRSRPModalOpen}
+        onRequestClose={() => setIsHistogramRSRPModalOpen(false)}
+        className='modal-content'
+        overlayClassName='modal-overlay'
+      >
+        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для гистограммы RSRP</h2>
+        <form className='space-y-4'>
+          <div>
+            <label htmlFor='timeStart' className='mb-1 block font-medium'>
+              Дата начала
+            </label>
+            <input
+              type='datetime-local'
+              id='timeStart'
+              value={timeStart}
+              onChange={e => setTimeStart(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div>
+            <label htmlFor='timeEnd' className='mb-1 block font-medium'>
+              Дата конца
+            </label>
+            <input
+              type='datetime-local'
+              id='timeEnd'
+              value={timeEnd}
+              onChange={e => setTimeEnd(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div className='flex justify-end space-x-4'>
+            <button
+              type='button'
+              className='rounded bg-gray-300 px-4 py-2'
+              onClick={() => setIsHistogramRSRPModalOpen(false)}
+            >
+              Отменить
+            </button>
+            <button
+              type='button'
+              className='rounded bg-blue-500 px-4 py-2 text-white'
+              onClick={handleHistogramRSRPModalApply}
+            >
+              Применить
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Модальное окно для гистограммы RSRQ */}
+      <Modal
+        isOpen={isHistogramRSRQModalOpen}
+        onRequestClose={() => setIsHistogramRSRQModalOpen(false)}
+        className='modal-content'
+        overlayClassName='modal-overlay'
+      >
+        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для гистограммы RSRQ</h2>
+        <form className='space-y-4'>
+          <div>
+            <label htmlFor='timeStart' className='mb-1 block font-medium'>
+              Дата начала
+            </label>
+            <input
+              type='datetime-local'
+              id='timeStart'
+              value={timeStart}
+              onChange={e => setTimeStart(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div>
+            <label htmlFor='timeEnd' className='mb-1 block font-medium'>
+              Дата конца
+            </label>
+            <input
+              type='datetime-local'
+              id='timeEnd'
+              value={timeEnd}
+              onChange={e => setTimeEnd(e.target.value)}
+              className='w-full rounded border px-2 py-1'
+            />
+          </div>
+          <div className='flex justify-end space-x-4'>
+            <button
+              type='button'
+              className='rounded bg-gray-300 px-4 py-2'
+              onClick={() => setIsHistogramRSRQModalOpen(false)}
+            >
+              Отменить
+            </button>
+            <button
+              type='button'
+              className='rounded bg-blue-500 px-4 py-2 text-white'
+              onClick={handleHistogramRSRQModalApply}
+            >
+              Применить
+            </button>
+          </div>
+        </form>
+      </Modal>
+
       <Modal
         isOpen={isInfoModalOpen}
         onRequestClose={() => setIsInfoModalOpen(false)}
@@ -244,9 +503,13 @@ export const PlotsPage = () => {
           </div>
         </form>
       </Modal>
+
       <div>
-        {/* {showPlots && <Plot />} */}
         {showPlots && <Plot timeStart={timeStart} timeEnd={timeEnd} />}
+        {showPlotsRSRQ && <PlotRSRQ timeStart={timeStart} timeEnd={timeEnd} />}
+        {showHistogramRSRP && <HistogramRSRP timeStart={timeStart} timeEnd={timeEnd} />}
+        {showHistogramRSRQ && <HistogramRSRQ timeStart={timeStart} timeEnd={timeEnd} />}
+
         {showInfo && (
           <div className='mt-8 rounded border p-4'>
             <h3 className='text-lg font-bold'>Результат:</h3>
@@ -280,9 +543,6 @@ export const PlotsPage = () => {
           onDrag={(e: any) => {
             e.target.style.transform = e.transform
           }}
-          // onBound={e => {
-          // console.log(e)
-          // }}
           onDragGroup={(e: any) => {
             e.events.forEach((ev: any) => {
               ev.target.style.transform = ev.transform
