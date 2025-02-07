@@ -16,9 +16,18 @@ export const instance = axios.create({
     'Content-Type': 'application/json'
   }
 })
-
 export const instance_rsrp = axios.create({
   baseURL: import.meta.env.VITE_API_RSRP,
+  // withCredentials: true,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    // 'Access-Control-Allow-Credentials': false,
+    'Content-Type': 'application/json'
+  }
+})
+
+export const instance_diagrams = axios.create({
+  baseURL: 'http://109.172.114.128:10000/api',
   // withCredentials: true,
   headers: {
     'Access-Control-Allow-Origin': '*',
@@ -137,7 +146,7 @@ export const api = {
   async getAppTraffic(): Promise<DiagramsData[]> {
     try {
       // const response = await instance.get('/sockets/getrsrpquality')
-      const response = await instance_rsrp.get('/user/getapptrafic')
+      const response = await instance_diagrams.get('/user/getapptrafic')
 
       // const { token } = response.data
       // localStorage.setItem('token', token)
