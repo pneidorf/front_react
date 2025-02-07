@@ -1,9 +1,14 @@
+/* eslint-disable i18next/no-literal-string */
+
+/* eslint-disable max-len */
 import { ScatterplotLayer } from '@deck.gl/layers'
 import DeckGL from '@deck.gl/react'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Map as MapLibreMap, NavigationControl } from 'react-map-gl/maplibre'
 
+import { JetColorTable } from './rsrptable'
+import { RSRQJetTable } from './rsrptable'
 import { api } from '~/shared/api'
 
 const MS_PER_DAY = 8.64e7 // миллисекунды в одном дне
@@ -31,7 +36,7 @@ export const MapDeck: React.FC = () => {
     rsrp: [-120, -60],
     rsrq: [-30, -5]
   })
-  const [isPanelVisible, setIsPanelVisible] = useState(false) // Управление видимостью панели
+  const [isPanelVisible, setIsPanelVisible] = useState(false)
 
   const { theme } = useTheme()
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
@@ -47,14 +52,23 @@ export const MapDeck: React.FC = () => {
     setFilterValue(getTimeRange)
   }, [getTimeRange])
 
-  const fetchMarkers = async (timeStart: string, timeEnd: string) => {
+  const fetchMarkers = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/markers.json') // Путь к вашему JSON
-      const data = await response.json()
+      // console.log('LOADING')
+      // const response = await fetch('/markers.json')
+      // const data = await response.json()
+      const data2 = await api.getThermalMapDataPoint(55.0, 82.0, 56.0, 83.0)
+      // console.log('API DATA')
+      // console.log(data2)
 
-      setRawData(data) // Сохраняем все данные
-      setMarkersData(data)
+      const filteredData = data2.filter(
+        (item: { lte: string | any[] }) =>
+          item && item.lte && Array.isArray(item.lte) && item.lte.length > 0
+      )
+
+      setRawData(filteredData)
+      setMarkersData(filteredData)
       setIsLoading(false)
     } catch (err) {
       setError('Error loading markers')
@@ -75,12 +89,20 @@ export const MapDeck: React.FC = () => {
         radiusScale: 100,
         radiusMinPixels: 2,
         radiusMaxPixels: 2,
-        getPosition: d => [parseFloat(d.lon), parseFloat(d.lat)],
+        getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
         getFillColor: d => {
-          const rsrp = d.rsrp
-          if (rsrp > -85) return [0, 200, 0]
-          if (rsrp > -95) return [255, 165, 0]
-          return [200, 0, 0]
+          if (!d.lte || !Array.isArray(d.lte) || d.lte.length === 0) {
+            console.log('пропуск')
+            return [0, 0, 0]
+          }
+          const rsrp = d.lte[0].rsrp
+
+          if (rsrp >= -70) return [255, 70, 0]
+          if (rsrp >= -80) return [255, 229, 0]
+          if (rsrp >= -90) return [124, 255, 121]
+          if (rsrp >= -100) return [54, 255, 192]
+          if (rsrp >= -110) return [0, 76, 255]
+          return [0, 0, 127]
         }
       }),
     selectedLayer === 2 &&
@@ -95,13 +117,17 @@ export const MapDeck: React.FC = () => {
         radiusScale: 100,
         radiusMinPixels: 2,
         radiusMaxPixels: 2,
-        getPosition: d => [parseFloat(d.lon), parseFloat(d.lat)],
+        getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
         getFillColor: d => {
-          const rsrq = d.rsrq
+          if (!d.lte || !Array.isArray(d.lte) || d.lte.length === 0) {
+            return [200, 0, 0]
+          }
+          const rsrq = d.lte[0].rsrq
 
-          if (rsrq > -10) return [0, 200, 0]
-          if (rsrq > -20) return [255, 165, 0]
-          return [200, 0, 0]
+          if (rsrq >= -5) return [255, 63, 0]
+          if (rsrq >= -10) return [255, 211, 0]
+          if (rsrq >= -15) return [15, 248, 231]
+          return [0, 0, 127]
         }
       })
   ]
@@ -113,33 +139,34 @@ export const MapDeck: React.FC = () => {
       return updated
     })
   }
-
+  const handleSliderChange = (newValue: [number, number]) => {
+    setFilterValue(newValue)
+    applyFilters()
+  }
   const applyFilters = () => {
-    setFilterRange(inputRange) // Синхронизация filterRange с inputRange
+    setFilterRange(inputRange)
 
     const filteredData = rawData.filter(marker => {
-      const rsrp = parseFloat(marker.rsrp)
-      const rsrq = parseFloat(marker.rsrq)
-      const markerOperator = marker.operator?.toLowerCase() // Приводим оператора к нижнему регистру для сравнения
+      const rsrp = parseFloat(marker.lte[0].rsrp)
+      const rsrq = parseFloat(marker.lte[0].rsrq)
+      const markerOperator = marker.operator?.toLowerCase()
+      const markerTime = new Date(marker.time).getTime()
 
       const withinRSRP = rsrp >= inputRange.rsrp[0] && rsrp <= inputRange.rsrp[1]
       const withinRSRQ = rsrq >= inputRange.rsrq[0] && rsrq <= inputRange.rsrq[1]
       const operatorMatch = operator === 'all' || operator === markerOperator
+      const withinTimeRange = markerTime >= filterValue![0] && markerTime <= filterValue![1]
 
       if (selectedLayer === 1) {
-        return withinRSRP && operatorMatch
+        return withinRSRP && operatorMatch && withinTimeRange
       }
       if (selectedLayer === 2) {
-        return withinRSRQ && operatorMatch
+        return withinRSRQ && operatorMatch && withinTimeRange
       }
-      return false // Для других слоев ничего не фильтруется
+      return false
     })
 
     setMarkersData(filteredData)
-  }
-
-  const handleSliderChange = (newValue: [number, number]) => {
-    setFilterValue(newValue)
   }
 
   const handleLayerChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -156,11 +183,12 @@ export const MapDeck: React.FC = () => {
   const handleShow = () => {
     if (filterValue) {
       const [start, end] = filterValue
-      fetchMarkers(new Date(start).toISOString(), new Date(end).toISOString())
+      fetchMarkers()
     }
   }
+
   const handleOperatorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setOperator(event.target.value) // Обновляем состояние оператора
+    setOperator(event.target.value)
   }
 
   return (
@@ -190,7 +218,7 @@ export const MapDeck: React.FC = () => {
             <option value='megafon'>Megafon</option>
           </select>
 
-          <div className='mt-4'>
+          {/* <div className='mt-4'>
             <label htmlFor='layer-select' className='mb-2 block font-medium text-gray-700'>
               Выбор бэнда:
             </label>
@@ -202,7 +230,7 @@ export const MapDeck: React.FC = () => {
             >
               <option value={0}>Выберите band</option>
             </select>
-          </div>
+          </div> */}
 
           <div className='mt-4'>
             <label htmlFor='layer-select' className='mb-2 block font-medium text-gray-700'>
@@ -333,6 +361,11 @@ export const MapDeck: React.FC = () => {
         <button onClick={handleShow} className='mt-4 bg-blue-500 p-2 text-white'>
           Показать
         </button>
+      </div>
+
+      <div className='absolute bottom-[62rem] right-4 z-10'>
+        {selectedLayer === 1 && <JetColorTable />}
+        {selectedLayer === 2 && <RSRQJetTable />}
       </div>
     </div>
   )

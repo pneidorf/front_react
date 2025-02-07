@@ -1,10 +1,11 @@
-/* eslint-disable i18next/no-literal-string */
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+/* eslint-disable i18next/no-literal-string */
 import { diff } from '@egjs/children-differ'
 import { LayersIcon } from '@radix-ui/react-icons'
 import * as Popover from '@radix-ui/react-popover'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import Modal from 'react-modal'
 import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
@@ -13,24 +14,41 @@ import { api } from '~/shared/api'
 import { HistogramRSRP } from '~/widgets/plots/ui/histogram'
 import { HistogramRSRQ } from '~/widgets/plots/ui/histogram'
 import { Plot } from '~/widgets/plots/ui/plot'
-import { PlotRSRQ } from '~/widgets/plots/ui/plotRSRQ'
 
 Modal.setAppElement('#root')
+interface Operator {
+  code: string
+  name: string
+}
 
 export const PlotsPage = () => {
-  const [editPlots, setEditPlots] = useState(false)
+  const [showDisplayPlots, setShowDisplayPlots] = useState<boolean>(false)
   const [showPlots, setShowPlots] = useState<boolean>(false)
-  const [showPlotsRSRQ, setShowPlotsRSRQ] = useState<boolean>(false)
   const [showHistogramRSRP, setShowHistogramRSRP] = useState<boolean>(false)
   const [showHistogramRSRQ, setShowHistogramRSRQ] = useState<boolean>(false)
   const [showInfo, setShowInfo] = useState<boolean>(false)
   const [targets, setTargets] = useState<HTMLElement[]>([])
-  const [isPlotsModalOpen, setIsPlotsModalOpen] = useState(false)
-  const [isPlotsRSRQModalOpen, setIsPlotsRSRQModalOpen] = useState(false)
   const [isHistogramRSRPModalOpen, setIsHistogramRSRPModalOpen] = useState(false)
   const [isHistogramRSRQModalOpen, setIsHistogramRSRQModalOpen] = useState(false)
-  const [timeStart, setTimeStart] = useState('')
-  const [timeEnd, setTimeEnd] = useState('')
+  const [selectedMetric, setSelectedMetric] = useState<string>(
+    () => localStorage.getItem('selectedMetric') || ''
+  )
+  const [operators, setOperators] = useState<Operator[]>([])
+  const [selectedOperator, setSelectedOperator] = useState<string>(
+    () => localStorage.getItem('selectedOperator') || ''
+  )
+  const [cellIds, setCellIds] = useState<string[]>([])
+  const [selectedCellId, setSelectedCellId] = useState<string>(
+    () => localStorage.getItem('selectedCellId') || ''
+  )
+  const [bands, setBands] = useState<string[]>([])
+  const [selectedBand, setSelectedBand] = useState<string>(
+    () => localStorage.getItem('selectedBand') || ''
+  )
+  const [timeStart, setTimeStart] = useState<string>(() => localStorage.getItem('timeStart') || '')
+  const [timeEnd, setTimeEnd] = useState<string>(() => localStorage.getItem('timeEnd') || '')
+  const [isFinalRequest, setIsFinalRequest] = useState<boolean>(false)
+
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
   const [inputValues, setInputValues] = useState<{
     LteMnc: string
@@ -50,6 +68,94 @@ export const PlotsPage = () => {
   const [responseData, setResponseData] = useState(null)
   const moveableRef = useRef<Moveable>(null)
   const selectoRef = useRef<Selecto>(null)
+  const operatorNames: { [key: string]: string } = useMemo(
+    () => ({
+      '99': 'Билайн',
+      '1': 'МТС',
+      '2': 'Мегафон'
+    }),
+    []
+  )
+
+  useEffect(() => {
+    if (selectedMetric) {
+      api
+        .getMnc()
+        .then((mncCodes: number[]) => {
+          const formattedOperators = mncCodes.map(code => ({
+            code: String(code),
+            name: operatorNames[String(code)] || `Оператор ${code}`
+          }))
+
+          setOperators(formattedOperators)
+        })
+        .catch(console.error)
+    }
+  }, [selectedMetric, operatorNames])
+
+  useEffect(() => {
+    if (selectedOperator) {
+      api
+        .getCellId(selectedOperator)
+        .then((response: string[]) => {
+          setCellIds(response || [])
+        })
+        .catch(error => {
+          console.error('Ошибка при получении Cell ID:', error)
+          setCellIds([])
+        })
+    }
+  }, [selectedOperator])
+
+  useEffect(() => {
+    if (selectedCellId) {
+      api
+        .getBand(selectedOperator, selectedCellId)
+        .then((response: string[]) => {
+          setBands(response || [])
+        })
+        .catch(error => {
+          console.error('Ошибка при получении Band:', error)
+          setBands([])
+        })
+    }
+  }, [selectedCellId, selectedOperator])
+
+  useEffect(() => {
+    localStorage.setItem('selectedMetric', selectedMetric)
+    localStorage.setItem('selectedOperator', selectedOperator)
+    localStorage.setItem('selectedCellId', selectedCellId)
+    localStorage.setItem('selectedBand', selectedBand)
+    localStorage.setItem('timeStart', timeStart)
+    localStorage.setItem('timeEnd', timeEnd)
+  }, [selectedMetric, selectedOperator, selectedCellId, selectedBand, timeStart, timeEnd])
+
+  const handleShowPlotsChange = () => {
+    setShowPlots(!showPlots)
+    setShowDisplayPlots(false)
+    setIsFinalRequest(false)
+  }
+
+  const handleFinalRequest = () => {
+    setShowDisplayPlots(true)
+    setIsFinalRequest(true)
+  }
+
+  const handleReset = () => {
+    setIsFinalRequest(false)
+    setSelectedMetric('')
+    setSelectedOperator('')
+    setSelectedCellId('')
+    setSelectedBand('')
+    setTimeStart('')
+    setTimeEnd('')
+    localStorage.removeItem('selectedMetric')
+    localStorage.removeItem('selectedOperator')
+    localStorage.removeItem('selectedCellId')
+    localStorage.removeItem('selectedBand')
+    localStorage.removeItem('timeStart')
+    localStorage.removeItem('timeEnd')
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValues({
@@ -75,22 +181,6 @@ export const PlotsPage = () => {
     }
   }
 
-  const handleShowPlotsChange = () => {
-    if (!showPlots) {
-      setIsPlotsModalOpen(true)
-    } else {
-      setShowPlots(false)
-    }
-  }
-
-  const handleShowPlotsRSRQChange = () => {
-    if (!showPlotsRSRQ) {
-      setIsPlotsRSRQModalOpen(true)
-    } else {
-      setShowPlotsRSRQ(false)
-    }
-  }
-
   const handleShowHistogramRSRPChange = () => {
     if (!showHistogramRSRP) {
       setIsHistogramRSRPModalOpen(true)
@@ -105,34 +195,6 @@ export const PlotsPage = () => {
     } else {
       setShowHistogramRSRQ(false)
     }
-  }
-
-  const handlePlotsModalApply = () => {
-    const formattedTimeStart = new Date(timeStart).toISOString()
-    const formattedTimeEnd = new Date(timeEnd).toISOString()
-
-    console.log(
-      `График RSRP: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
-    )
-
-    setTimeStart(formattedTimeStart)
-    setTimeEnd(formattedTimeEnd)
-    setIsPlotsModalOpen(false)
-    setShowPlots(true)
-  }
-
-  const handlePlotsRSRQModalApply = () => {
-    const formattedTimeStart = new Date(timeStart).toISOString()
-    const formattedTimeEnd = new Date(timeEnd).toISOString()
-
-    console.log(
-      `График RSRQ: Время начала - ${formattedTimeStart}, Время конца - ${formattedTimeEnd}`
-    )
-
-    setTimeStart(formattedTimeStart)
-    setTimeEnd(formattedTimeEnd)
-    setIsPlotsRSRQModalOpen(false)
-    setShowPlotsRSRQ(true)
   }
 
   const handleHistogramRSRPModalApply = () => {
@@ -161,15 +223,6 @@ export const PlotsPage = () => {
     setTimeEnd(formattedTimeEnd)
     setIsHistogramRSRQModalOpen(false)
     setShowHistogramRSRQ(true)
-  }
-
-  const handleEditPlotsChange = () => {
-    setEditPlots(!editPlots)
-    if (!editPlots) {
-      console.log('Редактирование графиков включено')
-    } else {
-      console.log('Редактирование графиков выключено')
-    }
   }
 
   const handleShowInfoChange = () => {
@@ -202,19 +255,90 @@ export const PlotsPage = () => {
               <fieldset className='Fieldset'>
                 <label>
                   <input type='checkbox' checked={showPlots} onChange={handleShowPlotsChange} />
-                  Отобразить график RSRP
+                  Отобразить графики
                 </label>
               </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
+              {showPlots && (
+                <>
+                  <select
+                    value={selectedMetric}
+                    onChange={e => setSelectedMetric(e.target.value)}
+                    disabled={isFinalRequest}
+                  >
+                    <option value=''>Выберите метрику</option>
+                    <option value='RSRP'>RSRP</option>
+                    <option value='RSRQ'>RSRQ</option>
+                  </select>
+
+                  <select
+                    value={selectedOperator}
+                    onChange={e => setSelectedOperator(e.target.value)}
+                    disabled={!selectedMetric || isFinalRequest}
+                  >
+                    <option value=''>Выберите оператора</option>
+                    {operators.map(op => (
+                      <option key={op.code} value={op.code}>
+                        {op.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={selectedCellId}
+                    onChange={e => setSelectedCellId(e.target.value)}
+                    disabled={!selectedOperator || isFinalRequest}
+                  >
+                    <option value=''>Выберите Cell ID</option>
+                    {cellIds.map(ci => (
+                      <option key={ci} value={ci}>
+                        {ci}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={selectedBand}
+                    onChange={e => setSelectedBand(e.target.value)}
+                    disabled={!selectedCellId || isFinalRequest}
+                  >
+                    <option value=''>Выберите Band</option>
+                    {bands.map(band => (
+                      <option key={band} value={band}>
+                        {band}
+                      </option>
+                    ))}
+                  </select>
+
                   <input
-                    type='checkbox'
-                    checked={showPlotsRSRQ}
-                    onChange={handleShowPlotsRSRQChange}
+                    type='datetime-local'
+                    value={timeStart ? new Date(timeStart).toISOString().slice(0, 19) : ''}
+                    onChange={e => setTimeStart(new Date(e.target.value).toISOString())}
+                    disabled={!selectedBand || isFinalRequest}
                   />
-                  Отобразить график RSRQ
-                </label>
-              </fieldset>
+
+                  <input
+                    type='datetime-local'
+                    value={timeEnd ? new Date(timeEnd).toISOString().slice(0, 19) : ''}
+                    onChange={e => setTimeEnd(new Date(e.target.value).toISOString())}
+                    disabled={!selectedBand || isFinalRequest}
+                  />
+
+                  <button
+                    className='rounded bg-blue-500 p-2 text-white'
+                    onClick={handleFinalRequest}
+                    disabled={!selectedBand || !timeStart || !timeEnd || isFinalRequest}
+                  >
+                    Отобразить
+                  </button>
+                </>
+              )}
+
+              {isFinalRequest && (
+                <button className='rounded bg-gray-500 p-2 text-white' onClick={handleReset}>
+                  Сбросить выбор
+                </button>
+              )}
+
               <fieldset className='Fieldset'>
                 <label>
                   <input
@@ -237,12 +361,6 @@ export const PlotsPage = () => {
               </fieldset>
               <fieldset className='Fieldset'>
                 <label>
-                  <input type='checkbox' checked={editPlots} onChange={handleEditPlotsChange} />
-                  Редактировать графики
-                </label>
-              </fieldset>
-              <fieldset className='Fieldset'>
-                <label>
                   <input type='checkbox' checked={showInfo} onChange={handleShowInfoChange} />
                   Получить информацию
                 </label>
@@ -254,111 +372,6 @@ export const PlotsPage = () => {
         </Popover.Portal>
       </Popover.Root>
 
-      {/* Модальное окно для графика RSRP */}
-      <Modal
-        isOpen={isPlotsModalOpen}
-        onRequestClose={() => setIsPlotsModalOpen(false)}
-        className='modal-content'
-        overlayClassName='modal-overlay'
-      >
-        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для графика RSRP</h2>
-        <form className='space-y-4'>
-          <div>
-            <label htmlFor='timeStart' className='mb-1 block font-medium'>
-              Дата начала
-            </label>
-            <input
-              type='datetime-local'
-              id='timeStart'
-              value={timeStart}
-              onChange={e => setTimeStart(e.target.value)}
-              className='w-full rounded border px-2 py-1'
-            />
-          </div>
-          <div>
-            <label htmlFor='timeEnd' className='mb-1 block font-medium'>
-              Дата конца
-            </label>
-            <input
-              type='datetime-local'
-              id='timeEnd'
-              value={timeEnd}
-              onChange={e => setTimeEnd(e.target.value)}
-              className='w-full rounded border px-2 py-1'
-            />
-          </div>
-          <div className='flex justify-end space-x-4'>
-            <button
-              type='button'
-              className='rounded bg-gray-300 px-4 py-2'
-              onClick={() => setIsPlotsModalOpen(false)}
-            >
-              Отменить
-            </button>
-            <button
-              type='button'
-              className='rounded bg-blue-500 px-4 py-2 text-white'
-              onClick={handlePlotsModalApply}
-            >
-              Применить
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Модальное окно для графика RSRQ */}
-      <Modal
-        isOpen={isPlotsRSRQModalOpen}
-        onRequestClose={() => setIsPlotsRSRQModalOpen(false)}
-        className='modal-content'
-        overlayClassName='modal-overlay'
-      >
-        <h2 className='mb-4 text-lg font-bold'>Укажите период времени для графика RSRQ</h2>
-        <form className='space-y-4'>
-          <div>
-            <label htmlFor='timeStart' className='mb-1 block font-medium'>
-              Дата начала
-            </label>
-            <input
-              type='datetime-local'
-              id='timeStart'
-              value={timeStart}
-              onChange={e => setTimeStart(e.target.value)}
-              className='w-full rounded border px-2 py-1'
-            />
-          </div>
-          <div>
-            <label htmlFor='timeEnd' className='mb-1 block font-medium'>
-              Дата конца
-            </label>
-            <input
-              type='datetime-local'
-              id='timeEnd'
-              value={timeEnd}
-              onChange={e => setTimeEnd(e.target.value)}
-              className='w-full rounded border px-2 py-1'
-            />
-          </div>
-          <div className='flex justify-end space-x-4'>
-            <button
-              type='button'
-              className='rounded bg-gray-300 px-4 py-2'
-              onClick={() => setIsPlotsRSRQModalOpen(false)}
-            >
-              Отменить
-            </button>
-            <button
-              type='button'
-              className='rounded bg-blue-500 px-4 py-2 text-white'
-              onClick={handlePlotsRSRQModalApply}
-            >
-              Применить
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Модальное окно для гистограммы RSRP */}
       <Modal
         isOpen={isHistogramRSRPModalOpen}
         onRequestClose={() => setIsHistogramRSRPModalOpen(false)}
@@ -410,7 +423,6 @@ export const PlotsPage = () => {
         </form>
       </Modal>
 
-      {/* Модальное окно для гистограммы RSRQ */}
       <Modal
         isOpen={isHistogramRSRQModalOpen}
         onRequestClose={() => setIsHistogramRSRQModalOpen(false)}
@@ -505,11 +517,18 @@ export const PlotsPage = () => {
       </Modal>
 
       <div>
-        {showPlots && <Plot timeStart={timeStart} timeEnd={timeEnd} />}
-        {showPlotsRSRQ && <PlotRSRQ timeStart={timeStart} timeEnd={timeEnd} />}
+        {showDisplayPlots && (
+          <Plot
+            timeStart={timeStart}
+            timeEnd={timeEnd}
+            selectedMetric={selectedMetric}
+            selectedOperator={selectedOperator}
+            selectedCellId={selectedCellId}
+            selectedBand={selectedBand}
+          />
+        )}{' '}
         {showHistogramRSRP && <HistogramRSRP timeStart={timeStart} timeEnd={timeEnd} />}
         {showHistogramRSRQ && <HistogramRSRQ timeStart={timeStart} timeEnd={timeEnd} />}
-
         {showInfo && (
           <div className='mt-8 rounded border p-4'>
             <h3 className='text-lg font-bold'>Результат:</h3>

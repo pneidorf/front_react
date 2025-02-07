@@ -49,7 +49,16 @@ export const api = {
       throw response?.data
     }
   },
-
+  async getThermalMapDataPoint(x1: number, y1: number, x2: number, y2: number) {
+    try {
+      const endpoint = `/v1/filter/dataheatmap/${x1}/${y1}/${x2}/${y2}`
+      const response = await instance_rsrp.get(endpoint)
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
   // async getRSRPQuality(): Promise<MarkerData[]> {
   //   try {
   //     // const response = await instance.get('/sockets/getrsrpquality')
@@ -68,6 +77,42 @@ export const api = {
   async getRSRPQuality(timestart: string, timeend: string): Promise<MarkerData[]> {
     try {
       const endpoint = `/v1/filter/ltequality/${timestart}/${timeend}`
+      const response = await instance_rsrp.get(endpoint)
+
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+
+  async getMnc() {
+    try {
+      const endpoint = `/v1/filter/available/mnc`
+      const response = await instance_rsrp.get(endpoint)
+
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+
+  async getCellId(mnc: string) {
+    try {
+      const endpoint = `/v1/filter/available/ci/${mnc}`
+      const response = await instance_rsrp.get(endpoint)
+
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+
+  async getBand(mnc: string, ci: string) {
+    try {
+      const endpoint = `/v1/filter/available/band/${mnc}/${ci}`
       const response = await instance_rsrp.get(endpoint)
 
       return response.data

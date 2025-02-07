@@ -42,6 +42,13 @@
   display: none;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Убирает скроллбар */
+}
+
 .phone {
   background-image: url('../../features/auth/icons/phone.png');
   background-size: cover;
