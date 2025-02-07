@@ -9,7 +9,7 @@ import { MarkerData } from '~/entities/markers'
 
 export const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
+  // withCredentials: true,
   headers: {
     // 'Access-Control-Allow-Origin': '*',
     // 'Access-Control-Allow-Credentials': true,
