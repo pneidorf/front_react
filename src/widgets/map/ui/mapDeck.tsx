@@ -1,5 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
-
 /* eslint-disable max-len */
 import { ScatterplotLayer } from '@deck.gl/layers'
 import DeckGL from '@deck.gl/react'
@@ -37,6 +35,7 @@ export const MapDeck: React.FC = () => {
     rsrq: [-30, -5]
   })
   const [isPanelVisible, setIsPanelVisible] = useState(false)
+  const [showProblemAreas, setShowProblemAreas] = useState(false)
 
   const { theme } = useTheme()
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
@@ -55,18 +54,11 @@ export const MapDeck: React.FC = () => {
   const fetchMarkers = async () => {
     try {
       setIsLoading(true)
-      // console.log('LOADING')
-      // const response = await fetch('/markers.json')
-      // const data = await response.json()
       const data2 = await api.getThermalMapDataPoint(55.0, 82.0, 56.0, 83.0)
-      // console.log('API DATA')
-      // console.log(data2)
-
       const filteredData = data2.filter(
         (item: { lte: string | any[] }) =>
           item && item.lte && Array.isArray(item.lte) && item.lte.length > 0
       )
-
       setRawData(filteredData)
       setMarkersData(filteredData)
       setIsLoading(false)
@@ -92,7 +84,6 @@ export const MapDeck: React.FC = () => {
         getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
         getFillColor: d => {
           if (!d.lte || !Array.isArray(d.lte) || d.lte.length === 0) {
-            console.log('пропуск')
             return [0, 0, 0]
           }
           const rsrp = d.lte[0].rsrp
@@ -129,6 +120,46 @@ export const MapDeck: React.FC = () => {
           if (rsrq >= -15) return [15, 248, 231]
           return [0, 0, 127]
         }
+      }),
+    showProblemAreas &&
+      new ScatterplotLayer({
+        id: 'problem-areas-layer',
+        data: markersData.filter(d => {
+          const rsrp = d.lte[0]?.rsrp
+          const rsrq = d.lte[0]?.rsrq
+          return (selectedLayer === 1 && rsrp < -100) || (selectedLayer === 2 && rsrq < -20)
+        }),
+        pickable: true,
+        opacity: 0.5,
+        stroked: true,
+        filled: true,
+        radiusScale: 100,
+        radiusMinPixels: 10,
+        radiusMaxPixels: 10,
+        getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
+        getFillColor: d => {
+          const rsrp = d.lte[0]?.rsrp
+          const rsrq = d.lte[0]?.rsrq
+          if (selectedLayer === 1 && rsrp < -100) {
+            return [255, 0, 0, 128] // Красный с прозрачностью
+          }
+          if (selectedLayer === 2 && rsrq < -20) {
+            return [0, 0, 255, 128] // Синий с прозрачностью
+          }
+          return [0, 0, 0]
+        },
+        getLineColor: d => {
+          const rsrp = d.lte[0]?.rsrp
+          const rsrq = d.lte[0]?.rsrq
+          if (selectedLayer === 1 && rsrp < -100) {
+            return [255, 0, 0] // Красный
+          }
+          if (selectedLayer === 2 && rsrq < -20) {
+            return [0, 0, 255] // Синий
+          }
+          return [0, 0, 0]
+        },
+        lineWidthMinPixels: 2
       })
   ]
 
@@ -139,10 +170,12 @@ export const MapDeck: React.FC = () => {
       return updated
     })
   }
+
   const handleSliderChange = (newValue: [number, number]) => {
     setFilterValue(newValue)
     applyFilters()
   }
+
   const applyFilters = () => {
     setFilterRange(inputRange)
 
@@ -191,6 +224,10 @@ export const MapDeck: React.FC = () => {
     setOperator(event.target.value)
   }
 
+  const handleShowProblemAreas = () => {
+    setShowProblemAreas(!showProblemAreas)
+  }
+
   return (
     <div className='relative h-full w-full'>
       <button
@@ -218,20 +255,6 @@ export const MapDeck: React.FC = () => {
             <option value='megafon'>Megafon</option>
           </select>
 
-          {/* <div className='mt-4'>
-            <label htmlFor='layer-select' className='mb-2 block font-medium text-gray-700'>
-              Выбор бэнда:
-            </label>
-            <select
-              id='layer-select'
-              // value={selectedLayer}
-              // onChange={handleLayerChange}
-              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-            >
-              <option value={0}>Выберите band</option>
-            </select>
-          </div> */}
-
           <div className='mt-4'>
             <label htmlFor='layer-select' className='mb-2 block font-medium text-gray-700'>
               Выбор слоя:
@@ -247,6 +270,15 @@ export const MapDeck: React.FC = () => {
               <option value={2}>RSRQ</option>
             </select>
           </div>
+
+          {selectedLayer > 0 && (
+            <button
+              className='mt-2 w-full rounded-md bg-red-500 py-2 text-white shadow-md hover:bg-red-600'
+              onClick={handleShowProblemAreas}
+            >
+              {showProblemAreas ? 'Скрыть проблемные зоны' : 'Показать проблемные зоны'}
+            </button>
+          )}
 
           {selectedLayer === 1 && (
             <div className='mt-4'>
