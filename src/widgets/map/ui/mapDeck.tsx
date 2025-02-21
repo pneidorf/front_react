@@ -1,6 +1,13 @@
 /* eslint-disable max-len */
 import { ScatterplotLayer } from '@deck.gl/layers'
+import { LineLayer } from '@deck.gl/layers'
+//import handoversData from  '../../../../public/handover.json'
+import { ArcLayer } from '@deck.gl/layers'
+import { IconLayer } from '@deck.gl/layers'
+import { TextLayer } from '@deck.gl/layers'
 import DeckGL from '@deck.gl/react'
+//import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import chroma from 'chroma-js'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Map as MapLibreMap, NavigationControl } from 'react-map-gl/maplibre'
@@ -10,6 +17,50 @@ import { RSRQJetTable } from './rsrptable'
 import { api } from '~/shared/api'
 
 const MS_PER_DAY = 8.64e7 // миллисекунды в одном дне
+
+interface Lte {
+  ID: number
+  RequestID: number
+  type: string
+  registered: boolean
+  mcc: number
+  mnc: number
+  ci: number
+  pci: number
+  tac: number
+  earfcn: number
+  bandwidth: number
+  rsrp: number
+  rssi: number
+  rsrq: number
+  rssnr: number
+  cqi: number
+  timingAdvance: number
+  ishandover: boolean
+  ispcicoll: boolean
+  isearfcncoll: boolean
+}
+
+interface Handover {
+  ID: number
+  CreatedAt: string
+  UpdatedAt: string
+  DeletedAt: string | null
+  jwt: string
+  UUID: string
+  time: string
+  latitude: number
+  longitude: number
+  operator: string
+  wcdma: any
+  gsm: any
+  lte: Lte[]
+  nr: any
+}
+
+interface ThermalMapDataPoint {
+  lte: Lte[]
+}
 
 export const MapDeck: React.FC = () => {
   const [viewState] = useState({
@@ -25,6 +76,11 @@ export const MapDeck: React.FC = () => {
   const [markersData, setMarkersData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<null | string>(null)
+  const [selectedHandover, setSelectedHandover] = useState<any>(null)
+  const [showArrows, setShowArrows] = useState<any>(null)
+  const [showArcs, setShowArcs] = useState<any>(null)
+  const [showIcons, setShowIcons] = useState<any>(null)
+  const [handoversData, setHandoversData] = useState<any[]>([])
   const [filterValue, setFilterValue] = useState<[number, number] | null>(null)
   const [inputRange, setInputRange] = useState({
     rsrp: [-120, -60],
@@ -36,6 +92,7 @@ export const MapDeck: React.FC = () => {
   })
   const [isPanelVisible, setIsPanelVisible] = useState(false)
   const [showProblemAreas, setShowProblemAreas] = useState(false)
+  const [showHandover, setShowHandover] = useState(false)
 
   const { theme } = useTheme()
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
@@ -51,14 +108,38 @@ export const MapDeck: React.FC = () => {
     setFilterValue(getTimeRange)
   }, [getTimeRange])
 
+  const getUniqueColor = index => chroma.hsv((index * 360) / handoversData.length, 0.7, 0.8).rgb()
+
   const fetchMarkers = async () => {
     try {
       setIsLoading(true)
-      const data2 = await api.getThermalMapDataPoint(55.0, 82.0, 56.0, 83.0)
+      const data2 = (await api.getThermalMapDataPoint(
+        55.0,
+        82.0,
+        56.0,
+        83.0
+      )) as ThermalMapDataPoint[]
+      const handovers = (await api.getThermalMapDataHandover(
+        55.0,
+        82.0,
+        56.0,
+        83.0
+      )) as Handover[][]
+
+      const processedHandovers = handovers.map((pair: Handover[]) => ({
+        from: pair[0],
+        to: pair[1]
+      }))
+
+      setHandoversData(processedHandovers)
+      console.log('handovers')
+      console.log(handovers)
+
       const filteredData = data2.filter(
-        (item: { lte: string | any[] }) =>
+        (item: ThermalMapDataPoint) =>
           item && item.lte && Array.isArray(item.lte) && item.lte.length > 0
       )
+
       setRawData(filteredData)
       setMarkersData(filteredData)
       setIsLoading(false)
@@ -160,6 +241,91 @@ export const MapDeck: React.FC = () => {
           return [0, 0, 0]
         },
         lineWidthMinPixels: 2
+      }),
+    showHandover &&
+      new LineLayer({
+        id: 'handovers-layer',
+        data: handoversData,
+        getSourcePosition: d => [d.from.longitude, d.from.latitude],
+        getTargetPosition: d => [d.to.longitude, d.to.latitude],
+        getColor: [147, 112, 219, 200],
+        getWidth: 3,
+        pickable: true,
+        arrowHead: {
+          type: 'triangle',
+          size: 15, // Размер наконечника в пикселях
+          length: 0.3, // Доля от длины линии (30%)
+          filled: true
+        },
+        onClick: ({ object }) => setSelectedHandover(object)
+      }),
+    showHandover &&
+      showArcs &&
+      new ArcLayer({
+        id: 'handovers-arcs-layer',
+        data: handoversData,
+        getSourcePosition: d => [d.from.longitude, d.from.latitude],
+        getTargetPosition: d => [d.to.longitude, d.to.latitude],
+        getSourceColor: [0, 128, 255], // Синий для начала дуги
+        getTargetColor: [255, 0, 128], // Розовый для конца дуги
+        getWidth: 2,
+        getHeight: 0.2, // Высота дуги в градусах
+        pickable: true,
+        greatCircle: false, // Дуга по большому кругу
+        onClick: ({ object }) => setSelectedHandover(object)
+      }),
+    showHandover &&
+      showArrows &&
+      new IconLayer({
+        id: 'handovers-start-points-layer',
+        data: handoversData,
+        getPosition: d => [d.from.longitude, d.from.latitude],
+        getIcon: () => ({
+          url: `data:image/svg+xml;utf8,${encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="blue" width="24" height="24"><circle cx="12" cy="12" r="6"/></svg>'
+          )}`,
+          width: 24,
+          height: 24,
+          anchorY: 12
+        }),
+        getSize: 20,
+        pickable: true,
+        onClick: ({ object }) => setSelectedHandover(object)
+      }),
+    showHandover &&
+      showArrows &&
+      new IconLayer({
+        id: 'handovers-icons-layer',
+        data: handoversData,
+        getPosition: d => [d.to.longitude, d.to.latitude],
+        getIcon: () => ({
+          url: `data:image/svg+xml;utf8,${encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" width="24" height="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
+          )}`,
+          width: 24,
+          height: 24,
+          anchorY: 12
+        }),
+        getSize: 20,
+        pickable: true,
+        onClick: ({ object }) => setSelectedHandover(object)
+      }),
+    showHandover &&
+      showIcons &&
+      new TextLayer({
+        id: 'handovers-text-layer',
+        data: handoversData,
+        getPosition: d => [
+          (d.from.longitude + d.to.longitude) / 2,
+          (d.from.latitude + d.to.latitude) / 2
+        ], // Центр линии
+        getText: d => `${d.from.lte[0].pci} to ${d.to.lte[0].pci}`,
+        getColor: [255, 255, 255, 200], // Белый текст
+        getSize: 14,
+        background: true,
+        backgroundColor: [0, 0, 0, 100], // Черный фон
+        pickable: true,
+        onClick: ({ object }) => setSelectedHandover(object)
       })
   ]
 
@@ -178,7 +344,7 @@ export const MapDeck: React.FC = () => {
 
   const applyFilters = () => {
     setFilterRange(inputRange)
-
+    console.log(handoversData)
     const filteredData = rawData.filter(marker => {
       const rsrp = parseFloat(marker.lte[0].rsrp)
       const rsrq = parseFloat(marker.lte[0].rsrq)
@@ -279,7 +445,36 @@ export const MapDeck: React.FC = () => {
               {showProblemAreas ? 'Скрыть проблемные зоны' : 'Показать проблемные зоны'}
             </button>
           )}
-
+          {selectedLayer > 0 && (
+            <button
+              onClick={() => setShowHandover(!showHandover)}
+              className='mt-2 w-full rounded-md bg-purple-500 p-2 py-2 text-white'
+            >
+              {showHandover ? 'Скрыть хендоверы' : 'Показать хендоверы'}
+            </button>
+          )}
+          {selectedLayer > 0 && (
+            <div className='mt-2 space-y-2'>
+              <button
+                onClick={() => setShowArrows(!showArrows)}
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
+              >
+                {showArrows ? 'Скрыть стрелки' : 'Показать стрелки'}
+              </button>
+              <button
+                onClick={() => setShowArcs(!showArcs)}
+                className='flex w-full items-center justify-center rounded-md bg-green-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-green-600'
+              >
+                {showArcs ? 'Скрыть дуги' : 'Показать дуги'}
+              </button>
+              <button
+                onClick={() => setShowIcons(!showIcons)}
+                className='flex w-full items-center justify-center rounded-md bg-purple-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-purple-600'
+              >
+                {showIcons ? 'Скрыть иконки' : 'Показать иконки'}
+              </button>
+            </div>
+          )}
           {selectedLayer === 1 && (
             <div className='mt-4'>
               <label className='block font-medium text-gray-700'>Диапазон RSRP:</label>
@@ -399,6 +594,46 @@ export const MapDeck: React.FC = () => {
         {selectedLayer === 1 && <JetColorTable />}
         {selectedLayer === 2 && <RSRQJetTable />}
       </div>
+      {selectedHandover && (
+        <div className='absolute bottom-20 right-4 z-20 w-64 rounded-lg bg-white p-4 text-black shadow-xl'>
+          <h3 className='mb-2 font-bold'>Детали хендовера</h3>
+          <div className='space-y-2'>
+            <p>
+              <span className='font-semibold'>Откуда:</span>
+              <br />
+              MCC: {selectedHandover.from.lte[0].mcc}
+              <br />
+              TAC: {selectedHandover.from.lte[0].tac}
+              <br />
+              PCI: {selectedHandover.from.lte[0].pci}
+            </p>
+            <p>
+              <span className='font-semibold'>Куда:</span>
+              <br />
+              MCC: {selectedHandover.to.lte[0].mcc}
+              <br />
+              TAC: {selectedHandover.to.lte[0].tac}
+              <br />
+              PCI: {selectedHandover.to.lte[0].pci}
+            </p>
+            <p>
+              <span className='font-semibold'>Координаты:</span>
+              <br />
+              От: {selectedHandover.from.latitude.toFixed(6)},{' '}
+              {selectedHandover.from.longitude.toFixed(6)}
+              <br />
+              До: {selectedHandover.to.latitude.toFixed(6)},{' '}
+              {selectedHandover.to.longitude.toFixed(6)}
+            </p>
+          </div>
+          <button
+            onClick={() => setSelectedHandover(null)}
+            className='mt-3 w-full rounded bg-blue-500 py-1 text-white hover:bg-blue-600'
+          >
+            Закрыть
+          </button>
+        </div>
+      )}
     </div>
   )
 }
