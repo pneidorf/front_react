@@ -68,6 +68,26 @@ export const api = {
       throw response?.data
     }
   },
+  async getCollisionThree(x1: number, y1: number, x2: number, y2: number) {
+    try {
+      const endpoint = `/v1/filter/collision/3/${x1}/${y1}/${x2}/${y2}`
+      const response = await instance_rsrp.get(endpoint)
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
+  async getCollisionSix(x1: number, y1: number, x2: number, y2: number) {
+    try {
+      const endpoint = `/v1/filter/collision/6/${x1}/${y1}/${x2}/${y2}`
+      const response = await instance_rsrp.get(endpoint)
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
+  },
   async getThermalMapDataHandover(x1: number, y1: number, x2: number, y2: number) {
     try {
       const endpoint = `/v1/filter/handover/${x1}/${y1}/${x2}/${y2}`

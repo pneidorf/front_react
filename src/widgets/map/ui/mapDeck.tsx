@@ -1,19 +1,11 @@
-/* eslint-disable max-len */
-import { ScatterplotLayer } from '@deck.gl/layers'
-import { LineLayer } from '@deck.gl/layers'
-//import handoversData from  '../../../../public/handover.json'
-import { ArcLayer } from '@deck.gl/layers'
-import { IconLayer } from '@deck.gl/layers'
-import { TextLayer } from '@deck.gl/layers'
+import { ArcLayer, IconLayer, LineLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers'
 import DeckGL from '@deck.gl/react'
-//import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import chroma from 'chroma-js'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Map as MapLibreMap, NavigationControl } from 'react-map-gl/maplibre'
 
-import { JetColorTable } from './rsrptable'
-import { RSRQJetTable } from './rsrptable'
+import { JetColorTable, RSRQJetTable } from './rsrptable'
 import { api } from '~/shared/api'
 
 const MS_PER_DAY = 8.64e7 // миллисекунды в одном дне
@@ -93,6 +85,10 @@ export const MapDeck: React.FC = () => {
   const [isPanelVisible, setIsPanelVisible] = useState(false)
   const [showProblemAreas, setShowProblemAreas] = useState(false)
   const [showHandover, setShowHandover] = useState(false)
+  const [showCollisionThree, setShowCollisionThree] = useState(false)
+  const [showCollisionSix, setShowCollisionSix] = useState(false)
+  const [collisionThreeData, setCollisionThreeData] = useState<any[]>([])
+  const [collisionSixData, setCollisionSixData] = useState<any[]>([])
 
   const { theme } = useTheme()
   const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
@@ -130,6 +126,13 @@ export const MapDeck: React.FC = () => {
         from: pair[0],
         to: pair[1]
       }))
+      const CollisionThree = await api.getCollisionThree(55.0, 82.0, 56.0, 83.0)
+      setCollisionThreeData(CollisionThree)
+      setShowCollisionThree(false)
+
+      const CollisionSix = await api.getCollisionSix(55.0, 82.0, 56.0, 83.0)
+      setCollisionSixData(CollisionSix)
+      setShowCollisionSix(false)
 
       setHandoversData(processedHandovers)
       console.log('handovers')
@@ -148,6 +151,26 @@ export const MapDeck: React.FC = () => {
       setIsLoading(false)
     }
   }
+
+  // const fetchCollisionThree = async () => {
+  //   try {
+  //     const data = await api.getCollisionThree(55.0, 82.0, 56.0, 83.0)
+  //     setCollisionThreeData(data)
+  //     setShowCollisionThree(true)
+  //   } catch (err) {
+  //     console.error('Error fetching collision three data:', err)
+  //   }
+  // }
+
+  // const fetchCollisionSix = async () => {
+  //   try {
+  //     const data = await api.getCollisionSix(55.0, 82.0, 56.0, 83.0)
+  //     setCollisionSixData(data)
+  //     setShowCollisionSix(true)
+  //   } catch (err) {
+  //     console.error('Error fetching collision six data:', err)
+  //   }
+  // }
 
   const layers = [
     selectedLayer === 1 &&
@@ -326,6 +349,34 @@ export const MapDeck: React.FC = () => {
         backgroundColor: [0, 0, 0, 100], // Черный фон
         pickable: true,
         onClick: ({ object }) => setSelectedHandover(object)
+      }),
+    showCollisionThree &&
+      new ScatterplotLayer({
+        id: 'collision-three-layer',
+        data: collisionThreeData,
+        pickable: true,
+        opacity: 0.8,
+        stroked: false,
+        filled: true,
+        radiusScale: 100,
+        radiusMinPixels: 5,
+        radiusMaxPixels: 5,
+        getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
+        getFillColor: [0, 0, 0]
+      }),
+    showCollisionSix &&
+      new ScatterplotLayer({
+        id: 'collision-six-layer',
+        data: collisionSixData,
+        pickable: true,
+        opacity: 0.8,
+        stroked: false,
+        filled: true,
+        radiusScale: 100,
+        radiusMinPixels: 5,
+        radiusMaxPixels: 5,
+        getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
+        getFillColor: [128, 0, 128]
       })
   ]
 
@@ -374,6 +425,8 @@ export const MapDeck: React.FC = () => {
   }
 
   const handleReset = () => {
+    setShowCollisionSix(false)
+    setShowCollisionThree(false)
     setFilterValue(getTimeRange)
     setSelectedLayer(0)
     setOperator('all')
@@ -392,6 +445,14 @@ export const MapDeck: React.FC = () => {
 
   const handleShowProblemAreas = () => {
     setShowProblemAreas(!showProblemAreas)
+  }
+
+  const handleShowCollisionThree = () => {
+    setShowCollisionThree(!showCollisionThree)
+  }
+
+  const handleShowCollisionSix = () => {
+    setShowCollisionSix(!showCollisionSix)
   }
 
   return (
@@ -472,6 +533,18 @@ export const MapDeck: React.FC = () => {
                 className='flex w-full items-center justify-center rounded-md bg-purple-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-purple-600'
               >
                 {showIcons ? 'Скрыть иконки' : 'Показать иконки'}
+              </button>
+              <button
+                onClick={handleShowCollisionThree}
+                className='flex w-full items-center justify-center rounded-md bg-black px-4 py-2 text-white shadow transition duration-300 hover:bg-gray-800'
+              >
+                {showCollisionThree ? 'Скрыть PCI коллизии 3' : 'Показать PCI коллизии 3'}
+              </button>
+              <button
+                onClick={handleShowCollisionSix}
+                className='flex w-full items-center justify-center rounded-md bg-purple-700 px-4 py-2 text-white shadow transition duration-300 hover:bg-purple-800'
+              >
+                {showCollisionSix ? 'Скрыть PCI коллизии 6' : 'Показать PCI коллизии 6'}
               </button>
             </div>
           )}
