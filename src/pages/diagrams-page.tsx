@@ -42,7 +42,7 @@ export const DiagramsPage = () => {
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
-            <PieChartIcon className='h-[50px] w-[50px]' />
+            <PieChartIcon className='phone:h-[30px] phone:w-[30px] h-[50px] w-[50px]' />
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -55,13 +55,13 @@ export const DiagramsPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <p className='Text pb-2'>Диаграммы</p>
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={showPlots} onChange={handleShowPlotsChange} />
                   Отобразить диаграмму
                 </label>
               </fieldset>
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={editPlots} onChange={handleEditPlotsChange} />
                   Редактировать диаграмму
                 </label>

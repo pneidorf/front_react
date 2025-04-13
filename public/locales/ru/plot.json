@@ -1,0 +1,46 @@
+{
+  "operator": {
+    "beeline": "Билайн",
+    "mts": "МТС",
+    "megafon": "Мегафон",
+    "default": "Оператор {{code}}"
+  },
+  "error": {
+    "cellId": "Ошибка при получении Cell ID:",
+    "band": "Ошибка при получении Band:",
+    "request": "Ошибка запроса:"
+  },
+  "plots": {
+    "title": "Графики",
+    "showPlots": "Отобразить графики",
+    "selectMetric": "Выберите метрику",
+    "selectOperator": "Выберите оператора",
+    "selectCellId": "Выберите Cell ID",
+    "selectBand": "Выберите Band",
+    "display": "Отобразить",
+    "reset": "Сбросить выбор",
+    "showHistogramRSRP": "Отобразить гистограмму RSRP",
+    "showHistogramRSRQ": "Отобразить гистограмму RSRQ",
+    "getInfo": "Получить информацию"
+  },
+  "histogram": {
+    "rsrp": {
+      "title": "Укажите период времени для гистограммы RSRP",
+      "log": "Гистограмма RSRP: Время начала - {{start}}, Время конца - {{end}}"
+    },
+    "rsrq": {
+      "title": "Укажите период времени для гистограммы RSRQ",
+      "log": "Гистограмма RSRQ: Время начала - {{start}}, Время конца - {{end}}"
+    },
+    "startDate": "Дата начала",
+    "endDate": "Дата конца",
+    "cancel": "Отменить",
+    "apply": "Применить"
+  },
+  "infoModal": {
+    "title": "Введите данные",
+    "cancel": "Отменить",
+    "apply": "Применить",
+    "result": "Результат:"
+  }
+}

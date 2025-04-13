@@ -1,0 +1,29 @@
+{
+  "diagrams": {
+    "title": "Диаграммы",
+    "show_diagram": "Отобразить диаграмму",
+    "edit_diagram": "Редактировать диаграмму",
+    "logs": {
+      "show": "Отображение диаграмм включено",
+      "hide": "Отображение диаграмм выключено",
+      "edit_enable": "Редактирование диаграмм включено",
+      "edit_disable": "Редактирование диаграмм выключено"
+    }
+  },
+  "tooltip": {
+    "app": "Приложение: {{app}}",
+    "traffic_bytes": "Количество трафика, байт: {{bytes}}",
+    "mobile_data": "Мобильные данные: {{bytes}}",
+    "wifi_data": "Wi-Fi данные: {{bytes}}"
+  },
+  "diagram": {
+    "xaxis_label": "Приложение",
+    "yaxis_label": "Байты",
+    "traffic_legend": "Количество трафика, байт"
+  },
+  "histogram": {
+    "rsrp_label": "RSRP",
+    "rsrq_label": "RSRQ",
+    "count_label": "Количество"
+  }
+}

@@ -12,6 +12,31 @@
 @tailwind components;
 @tailwind utilities;
 
+.App {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  @apply text-[16px];
+}
+
+h1 {
+  @apply text-[20px];
+}
+
+@media (min-width: 1px) and (max-width: 640px) {
+  html {
+    @apply text-[8px];
+  }
+  h1 {
+    @apply text-[15px];
+  }
+  html {
+    @apply h-full;
+  }
+}
+
 @layer base {
   .light {
     --contrast-color: #fff;

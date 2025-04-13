@@ -11,6 +11,29 @@ const config: Config = {
   darkMode: ['class'],
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
+    screens: {
+      phone: { max: '640px' },
+      // => @media (min-width: 640px) { ... }
+
+      laptop: '1024px',
+      // => @media (min-width: 1024px) { ... }
+
+      tablet: '761px',
+
+      'desktop-s': '912px',
+      // => @media (min-width: 912px) { ... }
+
+      desktop: '1380px',
+      // => @media (min-width: 1380px) { ... }
+
+      'desktop-l': '1920px',
+      // => @media (min-width: 1920px) { ... }
+
+      'desktop-xl': '2000px',
+      // => @media (min-width: 2000px) { ... }
+      'desktop-2xl': '3000px'
+      // => @media (min-width: 3000px) { ... }
+    },
     fontSize,
     extend: {
       borderRadius: {

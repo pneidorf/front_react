@@ -1,0 +1,46 @@
+{
+  "operator": {
+    "beeline": "Beeline",
+    "mts": "MTS",
+    "megafon": "Megafon",
+    "default": "Operator {{code}}"
+  },
+  "error": {
+    "cellId": "Error fetching Cell ID:",
+    "band": "Error fetching Band:",
+    "request": "Request error:"
+  },
+  "plots": {
+    "title": "Plots",
+    "showPlots": "Show plots",
+    "selectMetric": "Select metric",
+    "selectOperator": "Select operator",
+    "selectCellId": "Select Cell ID",
+    "selectBand": "Select Band",
+    "display": "Display",
+    "reset": "Reset selection",
+    "showHistogramRSRP": "Show RSRP histogram",
+    "showHistogramRSRQ": "Show RSRQ histogram",
+    "getInfo": "Get information"
+  },
+  "histogram": {
+    "rsrp": {
+      "title": "Specify time period for RSRP histogram",
+      "log": "RSRP Histogram: Start time - {{start}}, End time - {{end}}"
+    },
+    "rsrq": {
+      "title": "Specify time period for RSRQ histogram",
+      "log": "RSRQ Histogram: Start time - {{start}}, End time - {{end}}"
+    },
+    "startDate": "Start date",
+    "endDate": "End date",
+    "cancel": "Cancel",
+    "apply": "Apply"
+  },
+  "infoModal": {
+    "title": "Enter data",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "result": "Result:"
+  }
+}

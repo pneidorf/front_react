@@ -35,8 +35,8 @@ export const Diagram = () => {
   // const filteredData = diagramsData?.filter((_, index) => index % 80 === 0)
 
   return (
-    <div className='diagram-block'>
-      <div className='diagram-container-small'>
+    <div className='diagram-block phone:max-w-[50rem] phone:w-[50%] phone:max-h-[50rem] phone:left-[15%]'>
+      <div className='diagram-container-small phone:max-w-[50rem] phone:max-h-[50rem]'>
         {/* <ResponsiveContainer width='100%' height='100%'>
           <BarChart data={diagramsData && diagramsData[0].TrafficData}>
             <Bar dataKey='TotalBytes' fill='#8884d8' />

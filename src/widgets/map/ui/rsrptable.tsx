@@ -121,7 +121,7 @@ export const JetColorTable = () => {
   ]
 
   return (
-    <div className='absolute right-10 top-[33rem] z-20 bg-white shadow-md'>
+    <div className='phone:right-[1rem] absolute right-10 top-[33rem] z-20 bg-white shadow-md'>
       <table className='table-auto'>
         <thead>
           <tr>
@@ -132,11 +132,11 @@ export const JetColorTable = () => {
           {colorRanges.map((item, index) => (
             <tr key={index}>
               <td
-                className='border px-4 py-2 font-bold'
+                className='phone:h-[5px] h-[50px] border px-4 py-2 font-bold'
                 style={{
                   background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
                   color: item.range === '-120 дБм' ? '#FFFFFF' : '#000000',
-                  height: '50px',
+                  // height: '50px',
                   textAlign: 'center'
                 }}
               >
@@ -343,7 +343,7 @@ export const RSRQJetTable = () => {
   ]
 
   return (
-    <div className='absolute right-10 top-[38rem] z-20 bg-white shadow-md'>
+    <div className='phone:right-[1rem] phone:top-[33rem] absolute right-10 top-[38rem] z-20 bg-white shadow-md'>
       <table className='table-auto'>
         <thead>
           <tr>
@@ -354,11 +354,11 @@ export const RSRQJetTable = () => {
           {colorRanges.map((item, index) => (
             <tr key={index}>
               <td
-                className='border px-4 py-2 font-bold'
+                className='phone:h-[5px] h-[50px] border px-4 py-2 font-bold'
                 style={{
                   background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
                   color: item.range === '-20 дБ' ? '#FFFFFF' : '#000000',
-                  height: '50px',
+                  // height: '50px',
                   textAlign: 'center'
                 }}
               >

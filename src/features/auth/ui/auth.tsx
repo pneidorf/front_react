@@ -98,7 +98,7 @@ export const LoginForm = () => {
         </div>
         <div className='flex w-full justify-center'>
           <button
-            className='w-full max-w-32 rounded-[14px] bg-[#deb0f4] p-3 text-white hover:bg-[#b44be5]'
+            className='w-full max-w-32 rounded-[14px] bg-[#deb0f4] p-3 text-white hover:bg-[#b44be5] phone:text-[1.5rem]'
             type='submit'
             // eslint-disable-next-line i18next/no-literal-string
           >
@@ -178,7 +178,7 @@ export const RegistrationForm = ({ setFirstIsActive }: IReg) => {
         </div>
         <div className='flex w-full justify-center'>
           <button
-            className='w-full max-w-48 rounded-[14px] bg-[#deb0f4] p-3 text-white hover:bg-[#b44be5]'
+            className='w-full max-w-48 rounded-[14px] bg-[#deb0f4] p-3 text-white hover:bg-[#b44be5] phone:max-w-[18rem] phone:text-[1.5rem]'
             type='submit'
             // eslint-disable-next-line i18next/no-literal-string
           >

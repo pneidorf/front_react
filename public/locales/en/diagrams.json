@@ -1,0 +1,29 @@
+{
+  "diagrams": {
+    "title": "Diagrams",
+    "show_diagram": "Show diagram",
+    "edit_diagram": "Edit diagram",
+    "logs": {
+      "show": "Diagrams display enabled",
+      "hide": "Diagrams display disabled",
+      "edit_enable": "Diagram editing enabled",
+      "edit_disable": "Diagram editing disabled"
+    }
+  },
+  "tooltip": {
+    "app": "App: {{app}}",
+    "traffic_bytes": "Traffic amount, bytes: {{bytes}}",
+    "mobile_data": "Mobile data: {{bytes}}",
+    "wifi_data": "Wi-Fi data: {{bytes}}"
+  },
+  "diagram": {
+    "xaxis_label": "Application",
+    "yaxis_label": "Bytes",
+    "traffic_legend": "Traffic amount, bytes"
+  },
+  "histogram": {
+    "rsrp_label": "RSRP",
+    "rsrq_label": "RSRQ",
+    "count_label": "Count"
+  }
+}

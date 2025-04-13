@@ -238,7 +238,7 @@ export const PlotsPage = () => {
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
-            <LayersIcon className='h-[50px] w-[50px]' />
+            <LayersIcon className='phone:h-[30px] phone:w-[30px] h-[50px] w-[50px]' />
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -248,12 +248,12 @@ export const PlotsPage = () => {
             sideOffset={20}
             style={{ zIndex: 9999 }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className='phone:gap-1 flex flex-col gap-6'>
               <p className='Text' style={{ marginBottom: 10 }}>
                 Графики
               </p>
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={showPlots} onChange={handleShowPlotsChange} />
                   Отобразить графики
                 </label>
@@ -340,7 +340,7 @@ export const PlotsPage = () => {
               )}
 
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input
                     type='checkbox'
                     checked={showHistogramRSRP}
@@ -350,7 +350,7 @@ export const PlotsPage = () => {
                 </label>
               </fieldset>
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input
                     type='checkbox'
                     checked={showHistogramRSRQ}
@@ -360,7 +360,7 @@ export const PlotsPage = () => {
                 </label>
               </fieldset>
               <fieldset className='Fieldset'>
-                <label>
+                <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={showInfo} onChange={handleShowInfoChange} />
                   Получить информацию
                 </label>
@@ -549,8 +549,8 @@ export const PlotsPage = () => {
           bounds={{
             left: 0,
             top: 80,
-            right: 0,
-            bottom: 0,
+            right: 0, //570
+            bottom: 0, //-200
             position: 'css'
           }}
           onRender={(e: any) => {

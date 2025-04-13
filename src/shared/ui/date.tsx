@@ -29,5 +29,7 @@ export const CurrentDate = () => {
     return () => clearInterval(interval)
   }, [])
 
-  return <p className='text-lg font-bold text-primary'>{formatDate(date, i18n)}</p>
+  return (
+    <p className='phone:text-[0.8rem] text-lg font-bold text-primary'>{formatDate(date, i18n)}</p>
+  )
 }

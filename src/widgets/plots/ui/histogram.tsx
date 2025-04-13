@@ -37,8 +37,8 @@ export const HistogramRSRP = ({ timeStart, timeEnd }: HistogramProps) => {
     .sort((a, b) => a.rsrp - b.rsrp)
 
   return (
-    <div className='map-block'>
-      <div className='map-container-small'>
+    <div className='map-block phone:max-w-[10rem] phone:max-h-[10rem] phone:left-[0%]'>
+      <div className='map-container-small phone:max-w-[40rem] phone:max-h-[40rem]'>
         <ResponsiveContainer width='100%' height='100%'>
           <BarChart data={histogramData}>
             <CartesianGrid strokeDasharray='3 3' />
