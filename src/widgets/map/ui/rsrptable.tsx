@@ -1,7 +1,11 @@
+import { useTranslation } from 'react-i18next'
+
 export const RsrpColorTable = () => {
+  const { t } = useTranslation('map')
+
   const colorRanges = [
     {
-      range: '-120 дБм',
+      range: `-120 ${t('dBm')}`,
       gradientColors: ['#4C004C', '#C71585']
     },
     {
@@ -41,7 +45,7 @@ export const RsrpColorTable = () => {
                 className='border px-4 py-2 font-bold'
                 style={{
                   background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
-                  color: item.range === '-120 дБм' ? '#FFFFFF' : '#000000',
+                  color: item.range === `-120 ${t('dBm')}` ? '#FFFFFF' : '#000000',
                   height: '50px',
                   textAlign: 'center'
                 }}
@@ -57,9 +61,10 @@ export const RsrpColorTable = () => {
 }
 
 export const JetColorTable = () => {
+  const { t } = useTranslation('map')
   const colorRanges = [
     {
-      range: '-120 дБм',
+      range: `-120 ${t('dBm')}`,
       gradientColors: [
         'rgba(0, 0, 127, 255)',
         'rgba(0, 0, 163, 255)',
@@ -69,7 +74,7 @@ export const JetColorTable = () => {
       ]
     },
     {
-      range: '-110 дБм',
+      range: `-110 ${t('dBm')}`,
       gradientColors: [
         'rgba(0, 40, 255, 255)',
         'rgba(0, 76, 255, 255)',
@@ -79,7 +84,7 @@ export const JetColorTable = () => {
       ]
     },
     {
-      range: '-100 дБм',
+      range: `-100 ${t('dBm')}`,
       gradientColors: [
         'rgba(0, 212, 255, 255)',
         'rgba(12, 244, 234, 255)',
@@ -89,7 +94,7 @@ export const JetColorTable = () => {
       ]
     },
     {
-      range: '-90 дБм',
+      range: `-90 ${t('dBm')}`,
       gradientColors: [
         'rgba(124, 255, 121, 255)',
         'rgba(163, 255, 83, 255)',
@@ -99,7 +104,7 @@ export const JetColorTable = () => {
       ]
     },
     {
-      range: '-80 дБм',
+      range: `-80 ${t('dBm')}`,
       gradientColors: [
         'rgba(255, 229, 0, 255)',
         'rgba(255, 181, 0, 255)',
@@ -109,7 +114,7 @@ export const JetColorTable = () => {
       ]
     },
     {
-      range: '-70 дБм',
+      range: `-70 ${t('dBm')}`,
       gradientColors: [
         'rgba(255, 70, 0, 255)',
         'rgba(255, 22, 0, 255)',
@@ -121,7 +126,7 @@ export const JetColorTable = () => {
   ]
 
   return (
-    <div className='phone:right-[1rem] absolute right-10 top-[33rem] z-20 bg-white shadow-md'>
+    <div className='absolute right-10 top-[33rem] z-20 bg-white shadow-md phone:right-[1rem]'>
       <table className='table-auto'>
         <thead>
           <tr>
@@ -132,10 +137,10 @@ export const JetColorTable = () => {
           {colorRanges.map((item, index) => (
             <tr key={index}>
               <td
-                className='phone:h-[5px] h-[50px] border px-4 py-2 font-bold'
+                className='h-[50px] border px-4 py-2 font-bold phone:h-[5px]'
                 style={{
                   background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
-                  color: item.range === '-120 дБм' ? '#FFFFFF' : '#000000',
+                  color: item.range === `-120 ${t('dBm')}` ? '#FFFFFF' : '#000000',
                   // height: '50px',
                   textAlign: 'center'
                 }}
@@ -299,9 +304,11 @@ export const RSRQMagmaTable = () => {
 }
 
 export const RSRQJetTable = () => {
+  const { t } = useTranslation('map')
+
   const colorRanges = [
     {
-      range: '-20 дБ',
+      range: `-20 ${t('dB')}`,
       gradientColors: [
         'rgba(0, 0, 127, 255)',
         'rgba(0, 0, 186, 255)',
@@ -312,7 +319,7 @@ export const RSRQJetTable = () => {
       ]
     },
     {
-      range: '-15 дБ',
+      range: `-15 ${t('dB')}`,
       gradientColors: [
         'rgba(0, 192, 255, 255)',
         'rgba(15, 248, 231, 255)',
@@ -322,7 +329,7 @@ export const RSRQJetTable = () => {
       ]
     },
     {
-      range: '-10 дБ',
+      range: `-10 ${t('dB')}`,
       gradientColors: [
         'rgba(189, 255, 57, 255)',
         'rgba(231, 255, 15, 255)',
@@ -332,7 +339,7 @@ export const RSRQJetTable = () => {
       ]
     },
     {
-      range: '-5 дБ',
+      range: `-5 ${t('dB')}`,
       gradientColors: [
         'rgba(255, 63, 0, 255)',
         'rgba(245, 11, 0, 255)',
@@ -343,7 +350,7 @@ export const RSRQJetTable = () => {
   ]
 
   return (
-    <div className='phone:right-[1rem] phone:top-[33rem] absolute right-10 top-[38rem] z-20 bg-white shadow-md'>
+    <div className='absolute right-10 top-[38rem] z-20 bg-white shadow-md phone:right-[1rem] phone:top-[33rem]'>
       <table className='table-auto'>
         <thead>
           <tr>
@@ -354,10 +361,10 @@ export const RSRQJetTable = () => {
           {colorRanges.map((item, index) => (
             <tr key={index}>
               <td
-                className='phone:h-[5px] h-[50px] border px-4 py-2 font-bold'
+                className='h-[50px] border px-4 py-2 font-bold phone:h-[5px]'
                 style={{
                   background: `linear-gradient(to bottom, ${item.gradientColors.join(', ')})`,
-                  color: item.range === '-20 дБ' ? '#FFFFFF' : '#000000',
+                  color: item.range === `-20 ${t('dB')}` ? '#FFFFFF' : '#000000',
                   // height: '50px',
                   textAlign: 'center'
                 }}

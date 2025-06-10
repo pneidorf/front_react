@@ -60,7 +60,7 @@ export const api = {
   },
   async getThermalMapDataPoint(x1: number, y1: number, x2: number, y2: number) {
     try {
-      const endpoint = `/v1/filter/dataheatmap/${x1}/${y1}/${x2}/${y2}`
+      const endpoint = `/v1/filter/dataheatmap/${x1}/${y1}/${x2}/${y2}?compress=true`
       const response = await instance_rsrp.get(endpoint)
       return response.data
     } catch (error) {

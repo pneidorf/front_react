@@ -88,11 +88,18 @@ export const Map: FC = () => {
       map.current = null
     }
 
+    // map.current = new MapLibreMap({
+    //   container: mapContainer.current,
+    //   center: [lng, lat],
+    //   zoom: zoom,
+    //   style: `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+    // })
+
     map.current = new MapLibreMap({
       container: mapContainer.current,
       center: [lng, lat],
       zoom: zoom,
-      style: `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
     })
 
     map.current.on('load', () => {

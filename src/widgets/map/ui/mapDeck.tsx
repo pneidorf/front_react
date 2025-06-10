@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Map as MapLibreMap, NavigationControl } from 'react-map-gl/maplibre'
 
+// '../../../../coverage_tiles/'
 import { JetColorTable, RSRQJetTable } from './rsrptable'
 import { api } from '~/shared/api'
 
@@ -102,10 +103,10 @@ const useMapState = () => {
   return [viewState, setViewState]
 }
 
-const useMarkersData = () => {
-  const [markersData, setMarkersData] = useState<any[]>([])
-  return [markersData, setMarkersData]
-}
+// const useMarkersData = () => {
+//   const [markersData, setMarkersData] = useState<any[]>([])
+//   return [markersData, setMarkersData]
+// }
 
 const useFilters = () => {
   const [selectedLayer, setSelectedLayer] = useState(0)
@@ -192,7 +193,8 @@ export const MapDeck = () => {
   const { t } = useTranslation('map')
 
   const [viewState, setViewState] = useMapState()
-  const [markersData, setMarkersData] = useMarkersData()
+  // const [markersData, setMarkersData] = useMarkersData()
+  const [markersData, setMarkersData] = useState<any[]>([])
   const [isSimulationVisible, setIsSimulationVisible] = useState(false)
   const [frequencies, setFrequencies] = useState('')
   const [heightTx, setHeightTx] = useState('')
@@ -207,8 +209,48 @@ export const MapDeck = () => {
   // const [isSimulationVisible, setIsSimulationVisible] = useState(true);
   const filters = useFilters()
   const { theme } = useTheme()
-  const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
-  const mapstyle = `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+  // const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
+  // const mapstyle = `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+  const fetchWithTimeout = (url: string, timeout = 5000): Promise<string> =>
+    Promise.race([
+      fetch(url).then(async res => {
+        if (!res.ok) throw new Error('HTTP error ' + res.status)
+
+        const json = await res.json()
+        if (!json || !json.version || !json.sources || !json.layers) {
+          throw new Error('Invalid style JSON')
+        }
+
+        return url
+      }),
+      new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+    ])
+
+  const getResilientMapStyle = async (): Promise<string> => {
+    const mapStyleName = theme === 'dark' ? 'streets-dark' : 'streets'
+    const DEFAULT_STYLE = `https://api.maptiler.com/maps/${mapStyleName}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+    const FALLBACK_STYLES = ['https://basemaps.cartocdn.com/gl/positron-gl-style/style.json']
+
+    const urls = [DEFAULT_STYLE, ...FALLBACK_STYLES]
+
+    for (const url of urls) {
+      try {
+        const workingUrl = await fetchWithTimeout(url, 5000)
+        return workingUrl
+      } catch (_) {
+        continue
+      }
+    }
+
+    console.warn('Не удалось получить ни один рабочий стиль. Используется последний fallback.')
+    return FALLBACK_STYLES[FALLBACK_STYLES.length - 1]
+  }
+  const [mapStyle, setMapStyle] = useState<string | null>(null)
+
+  useEffect(() => {
+    getResilientMapStyle().then(setMapStyle)
+  }, [])
+  // const mapstyle = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
   // const [sectorPolygons, setSectorPolygons] = useState<SectorPolygon[]>([])
   // const [showSectorPolygons, setShowSectorPolygons] = useState(false)
   const [selectedSector, setSelectedSector] = useState<SectorPolygon | null>(null)
@@ -216,6 +258,9 @@ export const MapDeck = () => {
   // const [showBaseStation, setShowBaseStation] = useState(false)
   // const [baseStationsData, setBaseStationsData] = useState<BaseStation[]>([])
   const [selectedBaseStation, setSelectedBaseStation] = useState<BaseStation | null>(null)
+  // const [MmarkersData, setMMarkersData] = useState<any[]>([])
+  const [RawData, setRawData] = useState<any[]>([])
+  const [filterValue, setFilterValue] = useState<[number, number] | null>(null)
 
   const handleModelChange = event => {
     setModel(event.target.value)
@@ -286,8 +331,8 @@ export const MapDeck = () => {
   }, [])
 
   useEffect(() => {
-    filters.setFilterValue(getTimeRange)
-  }, [getTimeRange, filters])
+    setFilterValue(getTimeRange)
+  }, [getTimeRange])
 
   const getUniqueColor = index =>
     chroma.hsv((index * 360) / filters.handoversData.length, 0.7, 0.8).rgb()
@@ -316,6 +361,13 @@ export const MapDeck = () => {
         filters.setHandoversData(handovers.map(pair => ({ from: pair[0], to: pair[1] })))
 
         setMarkersData(data.filter(item => item?.lte?.length > 0))
+        const filteredData = data.filter(
+          (item: ThermalMapDataPoint) =>
+            item && item.lte && Array.isArray(item.lte) && item.lte.length > 0
+        )
+        setRawData(filteredData)
+        setFilterValue(null)
+        // setMarkersData(filteredData)
       } catch (err) {
         filters.setError('Error loading markers')
       } finally {
@@ -629,13 +681,13 @@ export const MapDeck = () => {
   }
 
   const handleSliderChange = (newValue: [number, number]) => {
-    filters.setFilterValue(newValue)
+    setFilterValue(newValue)
     applyFilters()
   }
 
   const applyFilters = () => {
     filters.setFilterRange(filters.inputRange)
-    const filteredData = markersData.filter(marker => {
+    const filteredData = RawData.filter(marker => {
       const rsrp = parseFloat(marker.lte[0].rsrp)
       const rsrq = parseFloat(marker.lte[0].rsrq)
       const markerOperator = marker.operator?.toLowerCase()
@@ -644,8 +696,7 @@ export const MapDeck = () => {
       const withinRSRP = rsrp >= filters.inputRange.rsrp[0] && rsrp <= filters.inputRange.rsrp[1]
       const withinRSRQ = rsrq >= filters.inputRange.rsrq[0] && rsrq <= filters.inputRange.rsrq[1]
       const operatorMatch = filters.operator === 'all' || filters.operator === markerOperator
-      const withinTimeRange =
-        markerTime >= filters.filterValue![0] && markerTime <= filters.filterValue![1]
+      const withinTimeRange = markerTime >= filterValue![0] && markerTime <= filterValue![1]
 
       if (filters.selectedLayer === 1) {
         return withinRSRP && operatorMatch && withinTimeRange
@@ -667,14 +718,14 @@ export const MapDeck = () => {
   const handleReset = () => {
     filters.setShowCollisionSix(false)
     filters.setShowCollisionThree(false)
-    filters.setFilterValue(getTimeRange)
+    setFilterValue(getTimeRange)
     filters.setSelectedLayer(0)
     filters.setOperator('all')
   }
 
   const handleShow = () => {
-    if (filters.filterValue) {
-      const [start, end] = filters.filterValue
+    if (filterValue) {
+      const [start, end] = filterValue
       const bounds = getViewBounds(viewState)
       fetchMarkers(bounds)
     }
@@ -702,80 +753,84 @@ export const MapDeck = () => {
         className='absolute left-4 top-4 z-10 rounded-full bg-blue-500 p-3 text-white shadow-lg hover:bg-blue-600'
         onClick={() => filters.setIsPanelVisible(!filters.isPanelVisible)}
       >
-        {filters.isPanelVisible ? 'Закрыть' : 'Фильтры'}
+        {filters.isPanelVisible ? t('close') : t('filters')}
       </button>
 
       <button
-        className='absolute right-4 top-4 z-10 rounded-full bg-green-500 p-3 text-white shadow-lg hover:bg-green-600'
+        className='absolute right-4 top-4 z-10 rounded-full bg-blue-500 p-3 text-white shadow-lg hover:bg-blue-600'
         onClick={() => setIsSimulationVisible(!isSimulationVisible)}
       >
-        {isSimulationVisible ? 'Закрыть симуляцию' : 'Симуляция'}
+        {isSimulationVisible ? t('hide_simulation') : t('simulation')}
       </button>
 
       {/* Форма симуляции */}
       {isSimulationVisible && (
-        <div className='absolute right-4 top-20 z-10 w-80 rounded-lg bg-white p-4 shadow-lg transition-transform duration-300'>
+        <div className='absolute right-4 top-20 z-50 w-80 rounded-lg bg-white p-4 shadow-lg transition-transform duration-300'>
           <select value={model} onChange={handleModelChange} className='mb-4'>
             <option value='COST Hata'>COST Hata</option>
             <option value='UMa'>UMa</option>
           </select>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Частота:</label>
+            <label className='block font-medium text-gray-700'>{t('frequency')}</label>
             <input
               type='text'
               value={frequencies}
               onChange={e => setFrequencies(e.target.value)}
-              placeholder='ГГц'
+              placeholder={t('GHz')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Высота передающей антенны:</label>
+            <label className='block font-medium text-gray-700'>
+              {t('height_of_transmitting_antenna')}
+            </label>
             <input
               type='text'
               value={heightTx}
               onChange={e => setHeightTx(e.target.value)}
-              placeholder='м'
+              placeholder={t('m')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Высота приемной антенны:</label>
+            <label className='block font-medium text-gray-700'>
+              {t('height_of_receiving_antenna')}
+            </label>
             <input
               type='text'
               value={heightRx}
               onChange={e => setHeightRx(e.target.value)}
-              placeholder='м'
+              placeholder={t('m')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Мощность передатчика:</label>
+            <label className='block font-medium text-gray-700'>{t('transmitter_power')}</label>
             <input
               type='text'
               value={transmitterPower}
               onChange={e => setTransmitterPower(e.target.value)}
-              placeholder='дБм'
+              placeholder={t('dBm')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Усиление антенны:</label>
+            <label className='block font-medium text-gray-700'>{t('antenna_gain')}</label>
             <input
               type='text'
               value={antennaGain}
               onChange={e => setAntennaGain(e.target.value)}
-              placeholder='дБи'
+              placeholder={t('dBi')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
           <div className='mb-4'>
-            <label className='block font-medium text-gray-700'>Потери в кабеле:</label>
+            <label className='block font-medium text-gray-700'>{t('cable_losses')}</label>
             <input
               type='text'
               value={cableLosses}
               onChange={e => setCableLosses(e.target.value)}
-              placeholder='дБ'
+              placeholder={t('dB')}
               className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             />
           </div>
@@ -783,25 +838,25 @@ export const MapDeck = () => {
             <>
               <div className='mb-4'>
                 <label className='block font-medium text-gray-700'>
-                  Стандартное отклонение затенения:
+                  {t('standard_deviation_of_shading')}
                 </label>
                 <input
                   type='text'
                   value={shadowingStdDev}
                   onChange={e => setShadowingStdDev(e.target.value)}
-                  placeholder='дБ'
+                  placeholder={t('dB')}
                   className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
                 />
               </div>
               <div className='mb-4'>
                 <label className='block font-medium text-gray-700'>
-                  Дополнительные потери среды:
+                  {t('additional_environmental_losses')}
                 </label>
                 <input
                   type='text'
                   value={additionalLosses}
                   onChange={e => setAdditionalLosses(e.target.value)}
-                  placeholder='дБ'
+                  placeholder={t('dB')}
                   className='mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
                 />
               </div>
@@ -811,7 +866,7 @@ export const MapDeck = () => {
             onClick={handleSubmit}
             className='w-full rounded-md bg-blue-500 py-2 text-white shadow-md hover:bg-blue-600'
           >
-            Отобразить
+            {t('show')}
           </button>
         </div>
       )}
@@ -819,7 +874,7 @@ export const MapDeck = () => {
       {filters.isPanelVisible && (
         <div className='absolute left-4 top-20 z-10 w-80 rounded-lg bg-white p-4 shadow-lg transition-transform duration-300'>
           <label htmlFor='operator-select' className='mb-2 block font-medium text-gray-700'>
-            Оператор:
+            {t('operator')}
           </label>
           <select
             id='operator-select'
@@ -827,7 +882,7 @@ export const MapDeck = () => {
             onChange={handleOperatorChange}
             className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
           >
-            <option value='all'>Все операторы</option>
+            <option value='all'>{t('all_operators')}</option>
             <option value='yota'>Yota</option>
             <option value='beeline'>Beeline</option>
             <option value='mts'>MTS</option>
@@ -836,7 +891,7 @@ export const MapDeck = () => {
 
           <div className='mt-4'>
             <label htmlFor='layer-select' className='mb-2 block font-medium text-gray-700'>
-              Выбор слоя:
+              {t('layer_selection')}
             </label>
             <select
               id='layer-select'
@@ -844,7 +899,7 @@ export const MapDeck = () => {
               onChange={handleLayerChange}
               className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             >
-              <option value={0}>Выберите слой</option>
+              <option value={0}>{t('select_a_layer')}</option>
               <option value={1}>RSRP</option>
               <option value={2}>RSRQ</option>
             </select>
@@ -852,31 +907,31 @@ export const MapDeck = () => {
 
           {filters.selectedLayer > 0 && (
             <button
-              className='mt-2 w-full rounded-md bg-red-500 py-2 text-white shadow-md hover:bg-red-600'
+              className='mt-2 flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               onClick={handleShowProblemAreas}
             >
-              {filters.showProblemAreas ? 'Скрыть проблемные зоны' : 'Показать проблемные зоны'}
+              {filters.showProblemAreas ? t('hide_problem_areas') : t('show_problem_areas')}
             </button>
           )}
           {filters.selectedLayer > 0 && (
             <button
               onClick={() => filters.setShowHandover(!filters.showHandover)}
-              className='mt-2 w-full rounded-md bg-purple-500 p-2 py-2 text-white'
+              className='mt-2 flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
             >
-              {filters.showHandover ? 'Скрыть хендоверы' : 'Показать хендоверы'}
+              {filters.showHandover ? t('hide_handovers') : t('show_handovers')}
             </button>
           )}
           {filters.selectedLayer > 0 && (
             <div className='mt-2 space-y-2'>
               <button
                 onClick={() => filters.setShowBaseStation(!filters.showBaseStation)}
-                className='mt-2 w-full rounded-md bg-purple-500 p-2 py-2 text-white'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
                 {filters.showBaseStation ? t('hide_bs') : t('show_bs')}
               </button>
               <button
                 onClick={() => filters.setShowSectorPolygons(!filters.showSectorPolygons)}
-                className='mt-2 w-full rounded-md bg-purple-500 p-2 py-2 text-white'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
                 {filters.showSectorPolygons ? t('hide_sector_polygons') : t('show_sector_polygons')}
               </button>
@@ -884,37 +939,39 @@ export const MapDeck = () => {
                 onClick={() => filters.setShowArrows(!filters.showArrows)}
                 className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
-                {filters.showArrows ? 'Скрыть стрелки' : 'Показать стрелки'}
+                {filters.showArrows ? t('hide_the_arrows') : t('show_the_arrows')}
               </button>
               <button
                 onClick={() => filters.setShowArcs(!filters.showArcs)}
-                className='flex w-full items-center justify-center rounded-md bg-green-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-green-600'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
-                {filters.showArcs ? 'Скрыть дуги' : 'Показать дуги'}
+                {filters.showArcs ? t('hide_arcs') : t('show_arcs')}
               </button>
               <button
                 onClick={() => filters.setShowIcons(!filters.showIcons)}
-                className='flex w-full items-center justify-center rounded-md bg-purple-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-purple-600'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
-                {filters.showIcons ? 'Скрыть иконки' : 'Показать иконки'}
+                {filters.showIcons ? t('hide_icons') : t('show_icons')}
               </button>
               <button
                 onClick={handleShowCollisionThree}
-                className='flex w-full items-center justify-center rounded-md bg-black px-4 py-2 text-white shadow transition duration-300 hover:bg-gray-800'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
-                {filters.showCollisionThree ? 'Скрыть PCI коллизии 3' : 'Показать PCI коллизии 3'}
+                {filters.showCollisionThree
+                  ? t('hide_PCI_collisions_3')
+                  : t('show_PCI_collisions_3')}
               </button>
               <button
                 onClick={handleShowCollisionSix}
-                className='flex w-full items-center justify-center rounded-md bg-purple-700 px-4 py-2 text-white shadow transition duration-300 hover:bg-purple-800'
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
-                {filters.showCollisionSix ? 'Скрыть PCI коллизии 6' : 'Показать PCI коллизии 6'}
+                {filters.showCollisionSix ? t('hide_PCI_collisions_6') : t('show_PCI_collisions_6')}
               </button>
             </div>
           )}
           {filters.selectedLayer === 1 && (
             <div className='mt-4'>
-              <label className='block font-medium text-gray-700'>Диапазон RSRP:</label>
+              <label className='block font-medium text-gray-700'>{t('rsrp_range')}</label>
               <div className='mt-2 flex items-center justify-between'>
                 <input
                   type='number'
@@ -959,13 +1016,13 @@ export const MapDeck = () => {
               onClick={handleReset}
               className='w-[48%] rounded-md bg-gray-300 py-2 text-gray-800 shadow-md hover:bg-gray-400'
             >
-              Сброс
+              {t('reset')}
             </button>
             <button
               onClick={applyFilters}
               className='w-[48%] rounded-md bg-blue-500 py-2 text-white shadow-md hover:bg-blue-600'
             >
-              Применить
+              {t('apply')}
             </button>
           </div>
         </div>
@@ -978,7 +1035,7 @@ export const MapDeck = () => {
         onViewStateChange={handleViewStateChange}
         style={{ position: 'absolute', width: '100%', height: '100%' }}
       >
-        <MapLibreMap mapStyle={mapstyle}>
+        <MapLibreMap mapStyle={mapStyle}>
           <NavigationControl position='top-left' />
         </MapLibreMap>
       </DeckGL>
@@ -986,14 +1043,10 @@ export const MapDeck = () => {
       <div className='z-9999 absolute bottom-10 left-[40rem] flex w-[40rem] flex-col items-center phone:left-[8rem] phone:w-[30rem]'>
         <div className='flex w-full justify-between'>
           <span>
-            {new Date(
-              filters.filterValue ? filters.filterValue[0] : getTimeRange[0]
-            ).toLocaleDateString()}
+            {new Date(filterValue ? filterValue[0] : getTimeRange[0]).toLocaleDateString()}
           </span>
           <span>
-            {new Date(
-              filters.filterValue ? filters.filterValue[1] : getTimeRange[1]
-            ).toLocaleDateString()}
+            {new Date(filterValue ? filterValue[1] : getTimeRange[1]).toLocaleDateString()}
           </span>
         </div>
 
@@ -1002,11 +1055,11 @@ export const MapDeck = () => {
           min={getTimeRange[0]}
           max={getTimeRange[1]}
           step={MS_PER_DAY}
-          value={filters.filterValue ? filters.filterValue[0] : getTimeRange[0]}
+          value={filterValue ? filterValue[0] : getTimeRange[0]}
           onChange={e =>
             handleSliderChange([
               parseInt(e.target.value),
-              filters.filterValue ? filters.filterValue[1] : getTimeRange[1]
+              filterValue ? filterValue[1] : getTimeRange[1]
             ])
           }
           className='w-full'
@@ -1017,10 +1070,10 @@ export const MapDeck = () => {
           min={getTimeRange[0]}
           max={getTimeRange[1]}
           step={MS_PER_DAY}
-          value={filters.filterValue ? filters.filterValue[1] : getTimeRange[1]}
+          value={filterValue ? filterValue[1] : getTimeRange[1]}
           onChange={e =>
             handleSliderChange([
-              filters.filterValue ? filters.filterValue[0] : getTimeRange[0],
+              filterValue ? filterValue[0] : getTimeRange[0],
               parseInt(e.target.value)
             ])
           }
@@ -1038,10 +1091,10 @@ export const MapDeck = () => {
       </div>
       {filters.selectedHandover && (
         <div className='absolute bottom-20 right-4 z-20 w-64 rounded-lg bg-white p-4 text-black shadow-xl'>
-          <h3 className='mb-2 font-bold'>Детали хендовера</h3>
+          <h3 className='mb-2 font-bold'>{t('details_of_the_handover')}</h3>
           <div className='space-y-2'>
             <p>
-              <span className='font-semibold'>Откуда:</span>
+              <span className='font-semibold'>{t('from')}</span>
               <br />
               MCC: {filters.selectedHandover.from.lte[0].mcc}
               <br />
@@ -1050,7 +1103,7 @@ export const MapDeck = () => {
               PCI: {filters.selectedHandover.from.lte[0].pci}
             </p>
             <p>
-              <span className='font-semibold'>Куда:</span>
+              <span className='font-semibold'>{t('where')}</span>
               <br />
               MCC: {filters.selectedHandover.to.lte[0].mcc}
               <br />
@@ -1059,12 +1112,12 @@ export const MapDeck = () => {
               PCI: {filters.selectedHandover.to.lte[0].pci}
             </p>
             <p>
-              <span className='font-semibold'>Координаты:</span>
+              <span className='font-semibold'>{t('coordinates')}</span>
               <br />
-              От: {filters.selectedHandover.from.latitude.toFixed(6)},{' '}
+              {t('by')} {filters.selectedHandover.from.latitude.toFixed(6)},{' '}
               {filters.selectedHandover.from.longitude.toFixed(6)}
               <br />
-              До: {filters.selectedHandover.to.latitude.toFixed(6)},{' '}
+              {t('to')} {filters.selectedHandover.to.latitude.toFixed(6)},{' '}
               {filters.selectedHandover.to.longitude.toFixed(6)}
             </p>
           </div>
@@ -1072,14 +1125,14 @@ export const MapDeck = () => {
             onClick={() => filters.setSelectedHandover(null)}
             className='mt-3 w-full rounded bg-blue-500 py-1 text-white hover:bg-blue-600'
           >
-            Закрыть
+            {t('close')}
           </button>
         </div>
       )}
 
       {selectedBaseStation && (
         <div className='absolute right-4 top-20 z-20 w-64 rounded-lg bg-white p-4 text-black shadow-xl'>
-          <h3 className='mb-2 font-bold'>Информация о базовой станции</h3>
+          <h3 className='mb-2 font-bold'>{t('BS_info')}</h3>
           <div className='space-y-2'>
             <p>
               <span className='font-semibold'>MNC:</span> {selectedBaseStation.mnc}
@@ -1094,34 +1147,35 @@ export const MapDeck = () => {
               <span className='font-semibold'>CI</span> {selectedBaseStation.ci}
             </p>
             <p>
-              <span className='font-semibold'>Широта:</span> {selectedBaseStation.lat.toFixed(6)}
+              <span className='font-semibold'>{t('Latitude')}</span>{' '}
+              {selectedBaseStation.lat.toFixed(6)}
             </p>
             <p>
-              <span className='font-semibold'>Долгота:</span> {selectedBaseStation.lon.toFixed(6)}
+              <span className='font-semibold'>{t('Longitude')}:</span>{' '}
+              {selectedBaseStation.lon.toFixed(6)}
             </p>
           </div>
           <button
             onClick={() => setSelectedBaseStation(null)}
             className='mt-3 w-full rounded bg-blue-500 py-1 text-white hover:bg-blue-600'
           >
-            Закрыть
+            {t('close')}
           </button>
         </div>
       )}
 
       {selectedSector && (
         <div className='absolute bottom-20 right-4 z-20 w-64 rounded-lg bg-white p-4 text-black shadow-xl'>
-          <h3 className='mb-2 font-bold'>Информация о секторе</h3>
+          <h3 className='mb-2 font-bold'>{t('sector_info')}</h3>
           <div className='space-y-2'>
             <p>
-              <span className='font-semibold'>Базовая станция:</span>{' '}
-              {selectedSector.baseStation.ci}
+              <span className='font-semibold'>{t('bs')}</span> {selectedSector.baseStation.ci}
             </p>
             <p>
-              <span className='font-semibold'>Сектор:</span> {selectedSector.sectorId}
+              <span className='font-semibold'>{t('sector')}</span> {selectedSector.sectorId}
             </p>
             <p>
-              <span className='font-semibold'>Угол направления:</span>{' '}
+              <span className='font-semibold'>{t('direction_angle')}</span>{' '}
               {selectedSector.sectorAngle.toFixed(2)}°
             </p>
             <p>
@@ -1131,7 +1185,7 @@ export const MapDeck = () => {
               <span className='font-semibold'>MNC:</span> {selectedSector.baseStation.mnc}
             </p>
             <div>
-              <span className='font-semibold'>Координаты сектора:</span>
+              <span className='font-semibold'>{t('sector_coordinates')}</span>
               <div className='mt-1 max-h-40 overflow-y-auto bg-gray-100 p-2 text-xs'>
                 {selectedSector.coordinates.map((coord, index) => (
                   <div key={index}>
@@ -1145,7 +1199,7 @@ export const MapDeck = () => {
             onClick={() => setSelectedSector(null)}
             className='mt-3 w-full rounded bg-blue-500 py-1 text-white hover:bg-blue-600'
           >
-            Закрыть
+            {t('close')}
           </button>
         </div>
       )}
