@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-indent */
+
 /* eslint-disable max-len */
 import { WebMercatorViewport } from '@deck.gl/core'
 import {
@@ -211,45 +213,59 @@ export const MapDeck = () => {
   const { theme } = useTheme()
   // const mapStyle = theme === 'dark' ? 'streets-dark' : 'streets'
   // const mapstyle = `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
-  const fetchWithTimeout = (url: string, timeout = 5000): Promise<string> =>
-    Promise.race([
-      fetch(url).then(async res => {
-        if (!res.ok) throw new Error('HTTP error ' + res.status)
-
-        const json = await res.json()
-        if (!json || !json.version || !json.sources || !json.layers) {
-          throw new Error('Invalid style JSON')
-        }
-
-        return url
-      }),
-      new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
-    ])
-
-  const getResilientMapStyle = async (): Promise<string> => {
-    const mapStyleName = theme === 'dark' ? 'streets-dark' : 'streets'
-    const DEFAULT_STYLE = `https://api.maptiler.com/maps/${mapStyleName}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
-    const FALLBACK_STYLES = ['https://basemaps.cartocdn.com/gl/positron-gl-style/style.json']
-
-    const urls = [DEFAULT_STYLE, ...FALLBACK_STYLES]
-
-    for (const url of urls) {
-      try {
-        const workingUrl = await fetchWithTimeout(url, 5000)
-        return workingUrl
-      } catch (_) {
-        continue
-      }
+  // const mapstyle = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+  const [mapStyle, setMapStyle] = useState(
+    'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+  )
+  const handleMapStyleChange = (type: 'simple' | 'detailed') => {
+    if (type === 'simple') {
+      setMapStyle('https://basemaps.cartocdn.com/gl/positron-gl-style/style.json')
+    } else {
+      const mapStyleName = theme === 'dark' ? 'streets-dark' : 'streets'
+      const detailedUrl = `https://api.maptiler.com/maps/${mapStyleName}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+      setMapStyle(detailedUrl)
     }
-
-    console.warn('Не удалось получить ни один рабочий стиль. Используется последний fallback.')
-    return FALLBACK_STYLES[FALLBACK_STYLES.length - 1]
   }
-  const [mapStyle, setMapStyle] = useState<string | null>(null)
+  // const fetchWithTimeout = (url: string, timeout = 5000): Promise<string> =>
+  //   Promise.race([
+  //     fetch(url).then(async res => {
+  //       if (!res.ok) throw new Error('HTTP error ' + res.status)
 
-  useEffect(() => {
-    getResilientMapStyle().then(setMapStyle)
-  }, [])
+  //       const json = await res.json()
+  //       if (!json || !json.version || !json.sources || !json.layers) {
+  //         throw new Error('Invalid style JSON')
+  //       }
+
+  //       return url
+  //     }),
+  //     new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+  //   ])
+
+  // const getResilientMapStyle = async (): Promise<string> => {
+  //   const mapStyleName = theme === 'dark' ? 'streets-dark' : 'streets'
+  //   const DEFAULT_STYLE = `https://api.maptiler.com/maps/${mapStyleName}/style.json?key=${import.meta.env.VITE_MAPLIBRE_API_KEY}`
+  //   const FALLBACK_STYLES = ['https://basemaps.cartocdn.com/gl/positron-gl-style/style.json']
+
+  //   const urls = [DEFAULT_STYLE, ...FALLBACK_STYLES]
+
+  //   for (const url of urls) {
+  //     try {
+  //       const workingUrl = await fetchWithTimeout(url, 5000)
+  //       return workingUrl
+  //     } catch (_) {
+  //       continue
+  //     }
+  //   }
+
+  //   console.warn('Не удалось получить ни один рабочий стиль. Используется последний fallback.')
+  //   return FALLBACK_STYLES[FALLBACK_STYLES.length - 1]
+  // }
+  // const [mapStyle, setMapStyle] = useState<string | null>(null)
+
+  // useEffect(() => {
+  //   getResilientMapStyle().then(setMapStyle)
+  // }, [])
+
   // const mapstyle = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
   // const [sectorPolygons, setSectorPolygons] = useState<SectorPolygon[]>([])
   // const [showSectorPolygons, setShowSectorPolygons] = useState(false)
@@ -749,6 +765,21 @@ export const MapDeck = () => {
 
   return (
     <div className='relative h-full w-full'>
+      <div className='absolute right-4 top-24 z-10 flex space-x-2'>
+        <button
+          onClick={() => handleMapStyleChange('simple')}
+          className='rounded bg-gray-100 px-4 py-2 shadow hover:bg-gray-200'
+        >
+          Упрощённый стиль
+        </button>
+        <button
+          onClick={() => handleMapStyleChange('detailed')}
+          className='rounded bg-gray-100 px-4 py-2 shadow hover:bg-gray-200'
+        >
+          Подробный стиль
+        </button>
+      </div>
+
       <button
         className='absolute left-4 top-4 z-10 rounded-full bg-blue-500 p-3 text-white shadow-lg hover:bg-blue-600'
         onClick={() => filters.setIsPanelVisible(!filters.isPanelVisible)}
