@@ -11,6 +11,7 @@ import Moveable from 'react-moveable'
 import Selecto from 'react-selecto'
 
 import { api } from '~/shared/api'
+import { CDFPlot } from '~/widgets/plots/ui/CDFPlot'
 import { HistogramRSRP } from '~/widgets/plots/ui/histogram'
 import { HistogramRSRQ } from '~/widgets/plots/ui/histogram'
 import { Plot } from '~/widgets/plots/ui/plot'
@@ -72,10 +73,15 @@ export const PlotsPage = () => {
     () => ({
       '99': 'Билайн',
       '1': 'МТС',
-      '2': 'Мегафон'
+      '2': 'Мегафон',
+      '20': 'Yota'
     }),
     []
   )
+  const [showCDFPlot, setShowCDFPlot] = useState<boolean>(false)
+  const handleShowCDFPlotChange = () => {
+    setShowCDFPlot(!showCDFPlot)
+  }
 
   useEffect(() => {
     if (selectedMetric) {
@@ -238,7 +244,7 @@ export const PlotsPage = () => {
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
-            <LayersIcon className='phone:h-[30px] phone:w-[30px] h-[50px] w-[50px]' />
+            <LayersIcon className='h-[50px] w-[50px] phone:h-[30px] phone:w-[30px]' />
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -248,7 +254,7 @@ export const PlotsPage = () => {
             sideOffset={20}
             style={{ zIndex: 9999 }}
           >
-            <div className='phone:gap-1 flex flex-col gap-6'>
+            <div className='flex flex-col gap-6 phone:gap-1'>
               <p className='Text' style={{ marginBottom: 10 }}>
                 Графики
               </p>
@@ -363,6 +369,12 @@ export const PlotsPage = () => {
                 <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={showInfo} onChange={handleShowInfoChange} />
                   Получить информацию
+                </label>
+              </fieldset>
+              <fieldset className='Fieldset'>
+                <label className='flex flex-row gap-2'>
+                  <input type='checkbox' checked={showCDFPlot} onChange={handleShowCDFPlotChange} />
+                  Отобразить CDF
                 </label>
               </fieldset>
             </div>
@@ -535,6 +547,7 @@ export const PlotsPage = () => {
             <pre className='bg-gray-100 p-2'>{JSON.stringify(responseData, null, 2)}</pre>
           </div>
         )}
+        {showCDFPlot && <CDFPlot />}
         <Moveable
           ref={moveableRef}
           target={targets}

@@ -9,6 +9,9 @@ export default mergeConfig(
       environment: 'jsdom',
       globals: true,
       setupFiles: './src/app/tests/setup.ts'
+    },
+    build: {
+      reportCompressedSize: true
     }
   })
 )

@@ -1116,7 +1116,7 @@ export const MapDeck = () => {
         </button> */}
       </div>
 
-      <div className='absolute bottom-[62rem] right-4 z-10 phone:bottom-[115rem] phone:right-0'>
+      <div className='absolute bottom-[62rem] right-4 z-10 phone:bottom-[70rem] phone:right-0'>
         {filters.selectedLayer === 1 && <JetColorTable />}
         {filters.selectedLayer === 2 && <RSRQJetTable />}
       </div>

@@ -247,5 +247,18 @@ export const api = {
       const { response } = error as AxiosError
       throw response?.data
     }
+  },
+  async getCDFOperator(mnc: string) {
+    try {
+      const endpoint = `/v1/filter/avarage/${mnc}`
+      const response = await instance_rsrp.get(endpoint)
+
+      return response.data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw response?.data
+    }
   }
 }
+
+// http://109.172.114.128:3000/api/v1/filter/avarage/1

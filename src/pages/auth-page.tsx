@@ -18,10 +18,7 @@ const DesktopAuth = ({ firstIsActive, handleClick, setFirstIsActive }: AuthProps
   <div className='reg-window-block flex h-full'>
     <div className='grid basis-1/2 grid-cols-10 grid-rows-6 gap-2 bg-[#202020]'>
       <div className='col-span-10 bg-[#202020]'>
-        <div className='ml-28 mt-10 text-[#ffffff]'>
-          <p className='text-[32px]'>Слоган</p>
-          <p className='text-[25px]'>пара предложений о приложении</p>
-        </div>
+        <div className='ml-28 mt-10 text-[#ffffff]'></div>
       </div>
       <div className='phone outline-3 col-span-6 col-start-2 row-span-5 mx-2 flex grid grid-cols-4 grid-rows-8 gap-2 rounded-t-[75px] border-x-8 border-t-8 border-black bg-gray-400 outline outline-offset-2 outline-white'>
         <div className='col-span-2 row-start-8 grid items-center justify-items-end'>
@@ -61,11 +58,7 @@ const DesktopAuth = ({ firstIsActive, handleClick, setFirstIsActive }: AuthProps
 
 const MobileAuth = ({ firstIsActive, handleClick, setFirstIsActive }: AuthProps) => (
   <div className='reg-window-block flex h-full flex-col items-center p-4'>
-    <div className='w-full bg-[#202020] p-6 text-center'>
-      <p className='text-[22px] text-[#ffffff]'>Слоган</p>
-      <p className='text-[15px] text-[#ffffff]'>пара предложений о приложении</p>
-    </div>
-    <div className='flex w-full flex-col items-center gap-4'>
+    <div className='flex w-full flex-col items-center gap-4 pt-[1rem]'>
       <div className='flex gap-4'>
         <button
           onClick={handleClick}
