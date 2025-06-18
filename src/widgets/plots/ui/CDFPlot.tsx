@@ -43,7 +43,7 @@ export const CDFPlot = () => {
             const count = data[`${dataType}_count`] as number
 
             const min = dataType === 'rsrp' ? -140 : -20
-            const max = dataType === 'rsrp' ? -40 : 0
+            const max = dataType === 'rsrp' ? -40 : -3
             const step = (max - min) / 100
 
             const cdf: { x: number; y: number }[] = []
