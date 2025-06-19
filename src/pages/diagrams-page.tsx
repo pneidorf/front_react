@@ -12,7 +12,7 @@ import Selecto from 'react-selecto'
 import { Diagram } from '~/widgets/diagrams/ui/diagram'
 
 export const DiagramsPage = () => {
-  const [editPlots, setEditPlots] = useState(false)
+  // const [editPlots, setEditPlots] = useState(false)
 
   const [showPlots, setShowPlots] = useState<boolean>(false)
   const [targets, setTargets] = useState<HTMLElement[]>([])
@@ -28,21 +28,21 @@ export const DiagramsPage = () => {
     }
   }
 
-  const handleEditPlotsChange = () => {
-    setEditPlots(!editPlots)
-    if (!editPlots) {
-      console.log('Редактирование диаграмм включено')
-    } else {
-      console.log('Редактирование диаграмм выключено')
-    }
-  }
+  // const handleEditPlotsChange = () => {
+  //   setEditPlots(!editPlots)
+  //   if (!editPlots) {
+  //     console.log('Редактирование диаграмм включено')
+  //   } else {
+  //     console.log('Редактирование диаграмм выключено')
+  //   }
+  // }
 
   return (
     <div className='relative ml-[2rem] h-[55rem] w-[113rem] border-2 border-none'>
       <Popover.Root>
         <Popover.Trigger asChild>
           <button className='pl-10 pt-10'>
-            <PieChartIcon className='phone:h-[30px] phone:w-[30px] h-[50px] w-[50px]' />
+            <PieChartIcon className='h-[50px] w-[50px] phone:h-[30px] phone:w-[30px]' />
           </button>
         </Popover.Trigger>
         <Popover.Portal>
@@ -60,12 +60,12 @@ export const DiagramsPage = () => {
                   Отобразить диаграмму
                 </label>
               </fieldset>
-              <fieldset className='Fieldset'>
+              {/* <fieldset className='Fieldset'>
                 <label className='flex flex-row gap-2'>
                   <input type='checkbox' checked={editPlots} onChange={handleEditPlotsChange} />
                   Редактировать диаграмму
                 </label>
-              </fieldset>
+              </fieldset> */}
             </div>
             <Popover.Close className='PopoverClose' aria-label='Close'></Popover.Close>
             <Popover.Arrow className='PopoverArrow' />
