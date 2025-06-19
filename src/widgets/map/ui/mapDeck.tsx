@@ -955,18 +955,6 @@ export const MapDeck = () => {
           {filters.selectedLayer > 0 && (
             <div className='mt-2 space-y-2'>
               <button
-                onClick={() => filters.setShowBaseStation(!filters.showBaseStation)}
-                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
-              >
-                {filters.showBaseStation ? t('hide_bs') : t('show_bs')}
-              </button>
-              <button
-                onClick={() => filters.setShowSectorPolygons(!filters.showSectorPolygons)}
-                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
-              >
-                {filters.showSectorPolygons ? t('hide_sector_polygons') : t('show_sector_polygons')}
-              </button>
-              <button
                 onClick={() => filters.setShowArrows(!filters.showArrows)}
                 className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
@@ -985,6 +973,18 @@ export const MapDeck = () => {
                 {filters.showIcons ? t('hide_icons') : t('show_icons')}
               </button>
               <button
+                onClick={() => filters.setShowBaseStation(!filters.showBaseStation)}
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
+              >
+                {filters.showBaseStation ? t('hide_bs') : t('show_bs')}
+              </button>
+              <button
+                onClick={() => filters.setShowSectorPolygons(!filters.showSectorPolygons)}
+                className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
+              >
+                {filters.showSectorPolygons ? t('hide_sector_polygons') : t('show_sector_polygons')}
+              </button>
+              {/* <button
                 onClick={handleShowCollisionThree}
                 className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
@@ -997,7 +997,7 @@ export const MapDeck = () => {
                 className='flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white shadow transition duration-300 hover:bg-blue-600'
               >
                 {filters.showCollisionSix ? t('hide_PCI_collisions_6') : t('show_PCI_collisions_6')}
-              </button>
+              </button> */}
             </div>
           )}
           {filters.selectedLayer === 1 && (
