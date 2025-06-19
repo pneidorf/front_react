@@ -7,10 +7,10 @@ import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } f
 import { api } from '~/shared/api'
 
 const MNC_MAP = {
-  '1': 'МТС',
-  '2': 'Мегафон',
-  '20': 'Yota',
-  '99': 'Билайн'
+  '1': 'Билайн',
+  '2': 'Yota',
+  '20': 'Мегафон',
+  '99': 'МТС'
 } as const
 
 const COLORS = {
